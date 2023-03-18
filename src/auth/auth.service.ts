@@ -57,16 +57,15 @@ export class AuthService {
     const newUser = await this.userRepository.create({
       account: newAccount,
       email: registerDto.email,
-      firstName: registerDto.firstName,
-      lastName: registerDto.lastName,
-      phoneNumber: registerDto.phoneNumber,
-      role: 'admin',
+      firstName: registerDto.firstName ? registerDto.firstName : null,
+      lastName: registerDto.lastName ? registerDto.firstName : null,
+      phoneNumber: registerDto.phoneNumber ? registerDto.firstName : null,
     });
 
     if (
-      registerDto.countryId != null &&
-      registerDto.provinceId != null &&
-      registerDto.districtId != null
+      !!registerDto.countryId &&
+      !!registerDto.provinceId &&
+      !!registerDto.districtId
     ) {
       const address = await this.addressService.createAddress(
         registerDto.countryId,
