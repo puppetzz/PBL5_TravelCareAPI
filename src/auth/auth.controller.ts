@@ -19,6 +19,7 @@ import { Request } from 'express';
 import { Tokens } from './types/tokens.type';
 import { GetCurrentAccount } from './decorators/get-current-account.decorator';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { LoginResponse } from './types/login-response.type';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -35,7 +36,7 @@ export class AuthController {
   @Post('login')
   @ApiOkResponse()
   @HttpCode(HttpStatus.OK)
-  login(@Body() loginDto: LoginDto): Promise<Tokens> {
+  login(@Body() loginDto: LoginDto): Promise<LoginResponse> {
     return this.authService.login(loginDto);
   }
 
