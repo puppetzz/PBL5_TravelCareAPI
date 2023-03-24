@@ -10,6 +10,7 @@ import { AddressModule } from '../address/address.module';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { S3Module } from '../aws-s3/s3.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
       secret: process.env.ACCESS_TOKEN_SECRET_KEY,
     }),
     AddressModule,
+    S3Module,
   ],
   exports: [
     JwtModule.register({
