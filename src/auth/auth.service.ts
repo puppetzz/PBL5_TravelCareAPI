@@ -16,6 +16,9 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types/tokens.type';
 import { config } from 'dotenv';
+import { UserModule } from '../user/user.module';
+import { LoginResponse } from './types/login-response.type';
+import { S3Service } from '../aws-s3/s3.service';
 
 config();
 
@@ -27,6 +30,7 @@ export class AuthService {
     @InjectRepository(Address) private addressRepository: Repository<Address>,
     private jwtService: JwtService,
     private readonly addressService: AddressService,
+    private readonly s3Service: S3Service,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -82,7 +86,7 @@ export class AuthService {
     return { message: 'Register successfully, please check your mail' };
   }
 
-  async login(loginDto: LoginDto): Promise<Tokens> {
+  async login(loginDto: LoginDto): Promise<LoginResponse> {
     const account = await this.accountRepository.findOne({
       where: {
         username: loginDto.username,
@@ -101,7 +105,18 @@ export class AuthService {
     const tokens = await this.getTokens(account.id, account.username);
     await this.updateRefreshTokenHash(account.id, tokens.refreshToken);
 
-    return tokens;
+    const currentUser = await this.userRepository.findOne({
+      where: {
+        accountId: account.id,
+      },
+    });
+
+    return {
+      user: {
+        username: account.username,
+      },
+      tokens,
+    };
   }
 
   async logout(id: string) {
