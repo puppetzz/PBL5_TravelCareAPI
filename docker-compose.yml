@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=jwt
+    ports:
+      - 5432:5432
+    volumes: 
+      - db:/var/lib/postgresql/data
+  api:
+    build:
+      context: .
+      target: development
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/travel-care/api
+      - /travel-care/api/node_modules
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    links:
+      - db
+    command: 'yarn start:dev'
+
+volumes:
+  db:
+    driver: local
