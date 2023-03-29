@@ -1,12 +1,13 @@
-FROM node:latest AS development
+FROM node:18.15.0-alpine AS development
 WORKDIR /travel-care/api
 ADD package*.json .
 RUN yarn install
 ADD . .
+RUN yarn migration:run
 RUN yarn build
 
 
-FROM node:latest AS production
+FROM node:18.15.0-alpine AS production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
