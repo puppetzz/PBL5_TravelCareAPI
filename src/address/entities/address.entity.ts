@@ -5,6 +5,7 @@ import { District } from './district.entity';
 import { User } from '../../user/entities/user.entity';
 import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Location } from '../../locations/entities/location.entity';
 
 @Entity()
 export class Address {
@@ -51,4 +52,7 @@ export class Address {
     onUpdate: 'CASCADE',
   })
   user: User;
+
+  @OneToOne(() => Location, (location) => location.address)
+  location: Location;
 }
