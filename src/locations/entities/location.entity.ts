@@ -6,11 +6,13 @@ import {
   OneToOne,
   JoinColumn,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Address } from '../../address/entities/address.entity';
 import { Category } from './category.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Review } from 'src/reviews/entities/review.entity';
 
 @Entity()
 export class Location {
@@ -52,4 +54,7 @@ export class Location {
 
   @ManyToMany(() => Category, (category) => category, { onUpdate: 'CASCADE' })
   categories: Category[];
+
+  @OneToMany(() => Review, (review) => review.location, { onUpdate: 'CASCADE' })
+  reviews: Review[];
 }
