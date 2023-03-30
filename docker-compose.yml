@@ -6,7 +6,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=jwt
+      - POSTGRES_DB=travel
     ports:
       - 5432:5432
     extra_hosts:
@@ -30,7 +30,8 @@ services:
       - NODE_ENV=development
     links:
       - db
-    command: 'yarn start:dev'
+    command: > 
+      sh -c "yarn migration:run && yarn start:dev"
 
 volumes:
   db:

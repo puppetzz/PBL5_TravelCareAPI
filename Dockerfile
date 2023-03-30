@@ -3,7 +3,6 @@ WORKDIR /travel-care/api
 ADD package*.json .
 RUN yarn install
 ADD . .
-RUN yarn migration:run
 RUN yarn build
 
 
