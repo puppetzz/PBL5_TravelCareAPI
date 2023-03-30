@@ -1,8 +1,16 @@
 import { Account } from 'src/auth/entities/account.entity';
 import { Address } from 'src/address/entities/address.entity';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
 import { IsDefined } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Location } from '../../locations/entities/location.entity';
 
 @Entity()
 export class User {
@@ -51,4 +59,10 @@ export class User {
   @JoinColumn()
   @ApiProperty({ type: () => Address })
   address: Address;
+
+  @OneToMany(() => Location, (location) => location.user, {
+    nullable: true,
+    onUpdate: 'CASCADE',
+  })
+  locations: Location[];
 }
