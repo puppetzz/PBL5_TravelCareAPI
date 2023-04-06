@@ -15,6 +15,9 @@ pipeline {
 				withCredentials([file(credentialsId: 'env', variable: 'secretFile')]) {
 					sh "cp $secretFile $WORKSPACE"
 				}
+				withCredentials([file(credentialsId: 'docker-env', variable: 'secretFile')]) {
+					sh "cp $secretFile $WORKSPACE"
+				}
 				sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} . "
 				sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
 				sh "docker image ls | grep ${DOCKER_IMAGE}"
