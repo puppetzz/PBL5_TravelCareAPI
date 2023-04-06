@@ -5,8 +5,8 @@ import {
   Entity,
   JoinColumn,
   OneToOne,
-  PrimaryColumn,
   OneToMany,
+  PrimaryColumn,
 } from 'typeorm';
 import { IsDefined } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -15,7 +15,7 @@ import { Review } from 'src/reviews/entities/review.entity';
 
 @Entity()
 export class User {
-  @PrimaryColumn()
+  @PrimaryColumn({ length: 10 })
   @ApiProperty()
   accountId: string;
 

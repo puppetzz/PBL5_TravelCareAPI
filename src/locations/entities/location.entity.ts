@@ -1,12 +1,12 @@
 import {
   Entity,
-  PrimaryColumn,
   Column,
   ManyToOne,
   OneToOne,
   JoinColumn,
   ManyToMany,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Address } from '../../address/entities/address.entity';
@@ -16,7 +16,7 @@ import { Review } from 'src/reviews/entities/review.entity';
 
 @Entity()
 export class Location {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   @ApiProperty()
   id: string;
 
