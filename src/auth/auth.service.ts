@@ -16,7 +16,6 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { Tokens } from './types/tokens.type';
 import { config } from 'dotenv';
-import { UserModule } from '../user/user.module';
 import { LoginResponse } from './types/login-response.type';
 import { S3Service } from '../aws-s3/s3.service';
 

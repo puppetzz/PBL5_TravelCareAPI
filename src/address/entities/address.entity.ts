@@ -5,6 +5,8 @@ import { District } from './district.entity';
 import { User } from '../../user/entities/user.entity';
 import { IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Location } from '../../locations/entities/location.entity';
+import { Ward } from './ward.entity';
 
 @Entity()
 export class Address {
@@ -39,8 +41,18 @@ export class Address {
     nullable: false,
   })
   @IsNotEmpty({ message: 'District should not empty' })
-  @ApiProperty({ type: District })
+  @ApiProperty({ type: () => District })
   district: District;
+
+  @ManyToOne(() => Ward, (ward) => ward.addresses, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    nullable: false,
+  })
+  @IsNotEmpty({ message: 'Ward should not empty' })
+  @ApiProperty({ type: () => Ward })
+  ward: Ward;
 
   @Column()
   @ApiProperty()
@@ -51,4 +63,7 @@ export class Address {
     onUpdate: 'CASCADE',
   })
   user: User;
+
+  @OneToOne(() => Location, (location) => location.address)
+  location: Location;
 }

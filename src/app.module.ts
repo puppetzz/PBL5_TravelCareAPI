@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from '../db/data-source';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
+import { LocationModule } from './locations/location.module';
 
 @Module({
   imports: [
@@ -14,6 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
     UserModule,
     AddressModule,
     AuthModule,
+    LocationModule,
   ],
 })
 export class AppModule {}

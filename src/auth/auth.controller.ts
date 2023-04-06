@@ -16,7 +16,6 @@ import { User } from '../user/entities/user.entity';
 import { LoginDto } from './dto/login.dto';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { Request } from 'express';
-import { Tokens } from './types/tokens.type';
 import { GetCurrentAccount } from './decorators/get-current-account.decorator';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { LoginResponse } from './types/login-response.type';
