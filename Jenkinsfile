@@ -42,7 +42,7 @@ pipeline {
 				sshagent(['ssh-remote']) {
 					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 rm -rf /root/project/*"
 					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_main/* /root/project"
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 cd /root/project/ && docker-compose stop && docker-compose rm -f && docker-compose pull && docker-compose up -d" 
+					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 cd /root/project/ && docker-compose stop && docker-compose rm -f && docker-compose up -d" 
 				}
 			}
 		}
@@ -55,7 +55,7 @@ pipeline {
 				sshagent(['ssh-remote']) {
 					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 rm -rf /root/project/*"
 					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_develop/* /root/project"
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 cd /root/project/ && docker-compose stop && docker-compose rm -f && docker-compose pull && docker-compose up -d" 
+					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.238.112 cd /root/project/ && docker-compose stop && docker-compose rm -f && docker-compose up -d" 
 				}
 			}
 		}
