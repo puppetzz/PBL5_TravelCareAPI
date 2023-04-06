@@ -18,8 +18,8 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./:/travel-care/api
-      - /travel-care/api/node_modules
+      - ./:/travel-care/
+      - /travel-care/node_modules
     depends_on:
       - db
     env_file:
