@@ -23,9 +23,7 @@ services:
     depends_on:
       - db
     env_file:
-      - docker.env
-    environment:
-      - NODE_ENV=development  
+      - docker.env 
     links:
       - db
     command: > 
