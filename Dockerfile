@@ -1,8 +1,8 @@
 FROM node:18.15.0-alpine AS development
 WORKDIR /travel-care/api
-ADD package*.json .
+ADD package*.json ./
 RUN yarn install
-ADD . .
+ADD ./ ./
 RUN yarn build
 
 
