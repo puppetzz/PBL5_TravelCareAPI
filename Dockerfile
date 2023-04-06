@@ -1,4 +1,4 @@
-FROM node:18.15.0-alpine AS development
+FROM node:18.15.0-alpine
 WORKDIR /travel-care/api
 ADD package*.json ./
 RUN yarn install
