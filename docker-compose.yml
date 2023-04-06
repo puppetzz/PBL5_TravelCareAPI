@@ -20,14 +20,14 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - .:/travel-care/api
+      - ./:/travel-care/api
       - /travel-care/api/node_modules
     depends_on:
       - db
     env_file:
       - docker.env
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=development  
     links:
       - db
     command: > 
