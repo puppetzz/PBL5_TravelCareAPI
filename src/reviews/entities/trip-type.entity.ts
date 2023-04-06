@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Review } from './review.entity';
 
 @Entity()
 export class TripType {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   @ApiProperty()
   id: string;
 

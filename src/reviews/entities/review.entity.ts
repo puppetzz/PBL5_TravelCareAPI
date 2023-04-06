@@ -7,7 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { ReviewImage } from './review-image.entity';
@@ -15,7 +15,7 @@ import { TripType } from './trip-type.entity';
 
 @Entity()
 export class Review {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   @ApiProperty()
   id: string;
 

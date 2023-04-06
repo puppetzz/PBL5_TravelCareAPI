@@ -3,6 +3,7 @@ import { Province } from './province.entity';
 import { Address } from './address.entity';
 import { IsDefined } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Ward } from './ward.entity';
 
 @Entity()
 export class District {
@@ -27,6 +28,9 @@ export class District {
   })
   @IsDefined()
   province: Province;
+
+  @OneToMany(() => Ward, (ward) => ward.district)
+  wards: Ward[];
 
   @OneToMany(() => Address, (address) => address.district)
   addresses: Address[];
