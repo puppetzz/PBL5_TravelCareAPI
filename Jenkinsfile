@@ -11,7 +11,7 @@ pipeline {
 				not {
 					anyOf {
 						branch 'main'
-						branch 'develop'
+						branch 'develop'	
 					}
 				}
 			}
@@ -87,7 +87,7 @@ pipeline {
 					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_main/* /root/project"
 					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose stop" 
 					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose rm -f" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose pull" 
+					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose pull api" 
 					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose up -d" 
 				}
 			}
