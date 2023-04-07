@@ -109,12 +109,12 @@ pipeline {
 					sh "cp $secretFile $WORKSPACE"
 				}
 				sshagent(['ssh-remote']) {
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.241.152 rm -rf /root/project/*"
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.241.152 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_develop/* /root/project"
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.241.152 cd /root/project/ && docker-compose stop" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.241.152 cd /root/project/ && docker-compose rm -f" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.241.152 cd /root/project/ && docker-compose pull" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 188.166.241.152 cd /root/project/ && docker-compose up -d" 
+					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 rm -rf /root/project/*"
+					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_develop/* /root/project"
+					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose stop" 
+					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose rm -f" 
+					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose pull" 
+					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose up -d" 
 				}
 			}
 		}
