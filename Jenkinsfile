@@ -73,7 +73,9 @@ pipeline {
 
 		stage("deploy main") {
 			when {
-				branch 'main'
+				anyOf {
+					branch 'main'
+				}
 			}
 			agent { node {label 'master'}}
 			steps {
@@ -92,7 +94,9 @@ pipeline {
 		}
 		stage("deploy develop") {
 			when {
-				branch 'develop'
+				anyOf {
+					branch 'develop'
+				}
 			}
 			agent { node {label 'master'}}
 			steps {
