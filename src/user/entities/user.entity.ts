@@ -15,7 +15,7 @@ import { Review } from 'src/reviews/entities/review.entity';
 
 @Entity()
 export class User {
-  @PrimaryColumn({ length: 10 })
+  @PrimaryColumn()
   @ApiProperty()
   accountId: string;
 
