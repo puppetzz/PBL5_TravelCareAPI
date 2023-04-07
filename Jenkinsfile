@@ -83,7 +83,7 @@ pipeline {
 				}
 				sshagent(['ssh-remote']) {
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 rm -rf /home/jette/project/*"
-					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_main/* /home/jette/project"
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care_main/* /home/jette/project"
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose stop" 
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose rm -f" 
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose pull api" 
@@ -110,7 +110,7 @@ pipeline {
 				}
 				sshagent(['ssh-remote']) {
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 rm -rf /home/jette/project/*"
-					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_develop/* /home/jette/project"
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care_develop/* /home/jette/project"
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose stop" 
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose rm -f" 
 					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose pull api" 
