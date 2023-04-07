@@ -82,12 +82,12 @@ pipeline {
 					sh "cp $secretFile $WORKSPACE"
 				}
 				sshagent(['ssh-remote']) {
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 rm -rf /root/project/*"
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_main/* /root/project"
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose stop" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose rm -f" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose pull api" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose up -d" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 rm -rf /home/jette/project/*"
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_main/* /home/jette/project"
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose stop" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose rm -f" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose pull api" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose up -d" 
 				}
 			}
 		}
@@ -109,12 +109,12 @@ pipeline {
 					sh "cp $secretFile $WORKSPACE"
 				}
 				sshagent(['ssh-remote']) {
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 rm -rf /root/project/*"
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_develop/* /root/project"
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose stop" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose rm -f" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose pull" 
-					sh "ssh -o StrictHostKeyChecking=no -l root 68.183.182.107 cd /root/project/ && docker-compose up -d" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 rm -rf /home/jette/project/*"
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care-api_develop/* /home/jette/project"
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose stop" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose rm -f" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose pull api" 
+					sh "ssh -o StrictHostKeyChecking=no -l jette 35.185.180.240 cd /home/jette/project/ && docker-compose up -d" 
 				}
 			}
 		}
