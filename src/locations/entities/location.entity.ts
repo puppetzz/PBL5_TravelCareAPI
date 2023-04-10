@@ -13,6 +13,7 @@ import { Address } from '../../address/entities/address.entity';
 import { Category } from './category.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Review } from 'src/reviews/entities/review.entity';
+import { LocationImage } from './location-image.entity';
 
 @Entity()
 export class Location {
@@ -37,6 +38,9 @@ export class Location {
 
   @Column({ default: false })
   isHotel: boolean;
+
+  @OneToMany(() => LocationImage, (locationImage) => locationImage.location)
+  locationImages: LocationImage[];
 
   @ManyToOne(() => User, (user) => user.locations, {
     nullable: true,
