@@ -74,6 +74,7 @@ export class AuthService {
         registerDto.countryId,
         registerDto.provinceId,
         registerDto.districtId,
+        registerDto.wardId,
         registerDto.streetAddress,
       );
       newUser.address = address;
