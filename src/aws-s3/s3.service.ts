@@ -5,6 +5,8 @@ import { v4 as uuid } from 'uuid';
 @Injectable()
 export class S3Service {
   async uploadImage(image: Express.Multer.File): Promise<string> {
+    if (!image) throw new BadRequestException('Image is required');
+
     if (!image.mimetype.includes('image'))
       throw new BadRequestException('This file must be an image');
 
@@ -14,7 +16,7 @@ export class S3Service {
       .upload({
         Bucket: process.env.S3_BUCKET_NAME,
         Body: image.buffer,
-        Key: `${uuid}-${image.filename}`,
+        Key: `${uuid()}-${image.filename}`,
         ContentType: image.mimetype,
       })
       .promise();
