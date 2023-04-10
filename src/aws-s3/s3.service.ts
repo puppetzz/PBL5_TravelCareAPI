@@ -16,7 +16,7 @@ export class S3Service {
       .upload({
         Bucket: process.env.S3_BUCKET_NAME,
         Body: image.buffer,
-        Key: `${uuid}-${image.filename}`,
+        Key: `${uuid()}-${image.filename}`,
         ContentType: image.mimetype,
       })
       .promise();
