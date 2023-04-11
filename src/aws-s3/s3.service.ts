@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
+import { log } from 'console';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
@@ -7,10 +8,11 @@ export class S3Service {
   async uploadImage(image: Express.Multer.File): Promise<string> {
     if (!image) throw new BadRequestException('Image is required');
 
-    if (!image.mimetype.includes('image'))
+    if (!image?.mimetype.includes('image'))
       throw new BadRequestException('This file must be an image');
 
     const s3 = new S3();
+    console.log(image.filename);
 
     const uploadResult = await s3
       .upload({
