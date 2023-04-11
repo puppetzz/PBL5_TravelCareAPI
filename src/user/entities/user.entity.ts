@@ -44,6 +44,16 @@ export class User {
   @ApiProperty()
   phoneNumber: string;
 
+  @Column({ nullable: true })
+  profileImageKey: string;
+
+  @Column({ nullable: true })
+  coverImageKey: string;
+
+  @Column({ nullable: true })
+  @ApiProperty()
+  about: string;
+
   @Column({ default: 'user' })
   @ApiProperty()
   role: string;

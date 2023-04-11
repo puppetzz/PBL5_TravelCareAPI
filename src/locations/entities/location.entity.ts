@@ -31,7 +31,7 @@ export class Location {
 
   @Column({ nullable: true })
   @ApiProperty()
-  About: string;
+  about: string;
 
   @Column({ nullable: true })
   description: string;
