@@ -3,7 +3,7 @@ pipeline {
 
 	environment {
 		DOCKER_IMAGE = "jette338/travel-care-api"
-		SERVER_IP = "34.142.255.42"
+		SERVER_IP = "159.223.45.103"
 	}
 
 	stages {
