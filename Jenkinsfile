@@ -5,6 +5,7 @@ pipeline {
 		DOCKER_IMAGE = "jette338/travel-care-api"
 		SERVER_IP = "159.223.45.103"
 		SSH_USER = "root"
+		HOME_DIR_SERVER = "/root/project"
 	}
 
 	stages {
@@ -85,7 +86,7 @@ pipeline {
 				}
 				sshagent(['ssh-remote']) {
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} rm -rf /home/jette/project/*"
-					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care_main/* /home/jette/project"
+					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care_main/* ${HOME_DIR_SERVER}"
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cd /home/jette/project/ && docker-compose stop" 
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cd /home/jette/project/ && docker-compose rm -f" 
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cd /home/jette/project/ && docker-compose pull api" 
@@ -112,7 +113,7 @@ pipeline {
 				}
 				sshagent(['ssh-remote']) {
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} rm -rf /home/jette/project/*"
-					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care_develop/* /home/jette/project"
+					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cp -R /var/lib/docker/volumes/jenkins_home/_data/workspace/travel-care_develop/* ${HOME_DIR_SERVER}"
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cd /home/jette/project/ && docker-compose stop" 
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cd /home/jette/project/ && docker-compose rm -f" 
 					sh "ssh -o StrictHostKeyChecking=no -l ${SSH_USER} ${SERVER_IP} cd /home/jette/project/ && docker-compose pull api" 
