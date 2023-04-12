@@ -1,14 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Address } from 'src/address/entities/address.entity';
 
-export class UserResponeDTO {
-  userame: string;
-  email: string;
-  address: Address;
+export class UserResponse {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  username: string;
+
+  @ApiProperty()
   createAt: Date;
+
+  @ApiProperty()
   firstName: string;
+
+  @ApiProperty()
   lastName: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
   phoneNumber: string;
+
+  @ApiProperty()
   profileImage: string;
+
+  @ApiProperty()
   coverImage: string;
+
+  @ApiProperty()
+  about: string;
+
+  @ApiProperty()
+  isSale: boolean;
 }

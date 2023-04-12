@@ -9,7 +9,7 @@ export class ReviewImage {
   id: string;
 
   @Column()
-  imageKey: string;
+  image: string;
 
   @ManyToOne(() => Review, (review) => review.reviewImages, {
     onDelete: 'CASCADE',

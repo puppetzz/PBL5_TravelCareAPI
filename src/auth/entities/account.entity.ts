@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryColumn, OneToOne } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Account {
@@ -13,11 +14,11 @@ export class Account {
   username: string;
 
   @Column({ nullable: false })
-  @ApiProperty()
+  @Exclude()
   passwordHash: string;
 
   @Column({ default: false })
-  @ApiProperty()
+  @Exclude()
   isVerified: boolean;
 
   @Column({ type: 'timestamp', default: new Date().toISOString() })
@@ -25,11 +26,11 @@ export class Account {
   createAt: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  @ApiProperty()
+  @Exclude()
   updateAt: Date;
 
   @Column({ nullable: true })
-  @ApiProperty()
+  @Exclude()
   refreshTokenHash: string;
 
   @OneToOne(() => User, (user) => user.account, { onDelete: 'CASCADE' })
