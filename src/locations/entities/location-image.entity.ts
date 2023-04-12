@@ -7,7 +7,7 @@ export class LocationImage {
   id: string;
 
   @Column()
-  imageKey: string;
+  image: string;
 
   @ManyToOne(() => Location, (location) => location.locationImages, {
     onDelete: 'CASCADE',
