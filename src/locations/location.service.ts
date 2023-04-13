@@ -76,7 +76,6 @@ export class LocationService {
   async createLocation(
     createLocationDto: CreateLocationDTO,
     user: User,
-    images: Express.Multer.File[],
   ): Promise<Location> {
     const {
       name,
@@ -89,6 +88,7 @@ export class LocationService {
       districtId,
       wardId,
       streetAddress,
+      images,
     } = createLocationDto;
 
     const newAddress = await this.addressService.createAddress(
@@ -99,8 +99,12 @@ export class LocationService {
       streetAddress,
     );
     await this.addressRepository.save(newAddress);
+    const categoriesArray = categories.split(',');
+    console.log(categories);
+    console.log(typeof categories);
+
     const categoryEntities = await this.categoryRepository.findBy({
-      id: In(categories),
+      id: In(categoriesArray),
     });
     const locationImages = [];
 

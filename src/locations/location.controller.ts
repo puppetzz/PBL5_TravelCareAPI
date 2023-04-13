@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Logger,
   Post,
   Query,
@@ -12,7 +14,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Location } from './entities/location.entity';
 import { FilterDto } from './dto/filterDTO';
 import { defaultPage, defaultLimit } from '../constant/constant';
@@ -22,6 +30,9 @@ import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decor
 import { AuthGuard } from '@nestjs/passport';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesToBodyInterceptor } from './api-file.decorator';
+import { create } from 'domain';
+
 @Controller('locations')
 @ApiTags('location')
 export class LocationController {
@@ -36,15 +47,17 @@ export class LocationController {
     return this.locationService.getLocations({ ...filterDto, page, limit });
   }
   @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Create a location' })
   @Post()
   @UsePipes(ValidationPipe)
-  @UseInterceptors(FilesInterceptor('images'))
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('images'), FilesToBodyInterceptor)
   createLocation(
     @Body() createLocationDTO: CreateLocationDTO,
     @GetCurrentAccount() user: User,
-    @UploadedFiles()
-    images: Express.Multer.File[],
   ): Promise<Location> {
-    return this.locationService.createLocation(createLocationDTO, user, images);
+    return this.locationService.createLocation(createLocationDTO, user);
   }
 }
