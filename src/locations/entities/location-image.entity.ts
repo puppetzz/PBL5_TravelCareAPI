@@ -3,11 +3,14 @@ import { Location } from './location.entity';
 
 @Entity()
 export class LocationImage {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column()
-  image: string;
+  imageKey: string;
+
+  @Column()
+  imageUrl: string;
 
   @ManyToOne(() => Location, (location) => location.locationImages, {
     onDelete: 'CASCADE',
