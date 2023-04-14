@@ -43,7 +43,7 @@ export class UserService {
   }
 
   async updateProfieImage(user: User, image: Express.Multer.File) {
-    const profileImage = await this.s3Service.uploadImage(image);
+    const { key, url } = await this.s3Service.uploadImage(image);
 
     console.log(user.profileImage);
 
@@ -53,14 +53,14 @@ export class UserService {
 
     await this.userRepository.update(
       { accountId: user.accountId },
-      { profileImage: profileImage },
+      { profileImage: key },
     );
 
-    return await this.s3Service.generatePresignedUrl(profileImage);
+    return url;
   }
 
   async updateCoverImage(user: User, image: Express.Multer.File) {
-    const coverImage = await this.s3Service.uploadImage(image);
+    const { key, url } = await this.s3Service.uploadImage(image);
 
     if (user.coverImage) {
       await this.s3Service.deleteImage(user.coverImage);
@@ -68,10 +68,10 @@ export class UserService {
 
     await this.userRepository.update(
       { accountId: user.accountId },
-      { coverImage: coverImage },
+      { coverImage: key },
     );
 
-    return await this.s3Service.generatePresignedUrl(coverImage);
+    return url;
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {

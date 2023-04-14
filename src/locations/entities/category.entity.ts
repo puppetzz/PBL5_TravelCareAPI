@@ -10,7 +10,7 @@ import { Location } from '../../locations/entities/location.entity';
 
 @Entity()
 export class Category {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   @ApiProperty()
   id: string;
 

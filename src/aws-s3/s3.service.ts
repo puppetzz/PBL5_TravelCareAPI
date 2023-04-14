@@ -1,10 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
+import { UploadResult } from './types/upload-result.type';
 
 @Injectable()
 export class S3Service {
-  async uploadImage(image: Express.Multer.File): Promise<string> {
+  async uploadImage(image: Express.Multer.File): Promise<UploadResult> {
     if (!image) throw new BadRequestException('Image is required');
 
     if (!image?.mimetype.includes('image'))
@@ -22,7 +23,10 @@ export class S3Service {
       })
       .promise();
 
-    return uploadResult.Key;
+    return {
+      key: uploadResult.Key,
+      url: uploadResult.Location,
+    };
   }
 
   async deleteImage(key: string): Promise<void> {
@@ -41,7 +45,7 @@ export class S3Service {
     return s3.getSignedUrlPromise('getObject', {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: key,
-      Expires: 3600,
+      Expires: 3600 * 3600,
     });
   }
 }

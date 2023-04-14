@@ -4,12 +4,15 @@ import { Review } from './review.entity';
 
 @Entity()
 export class ReviewImage {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   @ApiProperty()
   id: string;
 
   @Column()
-  image: string;
+  imageKey: string;
+
+  @Column()
+  imageUrl: string;
 
   @ManyToOne(() => Review, (review) => review.reviewImages, {
     onDelete: 'CASCADE',
