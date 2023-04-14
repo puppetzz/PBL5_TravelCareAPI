@@ -1,6 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
-import { log } from 'console';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()
@@ -28,10 +27,12 @@ export class S3Service {
 
   async deleteImage(key: string): Promise<void> {
     const s3 = new S3();
-    await s3.deleteObject({
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: key,
-    });
+    await s3
+      .deleteObject({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+      })
+      .promise();
   }
 
   async generatePresignedUrl(key: string): Promise<string> {
@@ -39,7 +40,8 @@ export class S3Service {
 
     return s3.getSignedUrlPromise('getObject', {
       Bucket: process.env.S3_BUCKET_NAME,
-      key: key,
+      Key: key,
+      Expires: 3600,
     });
   }
 }

@@ -1,6 +1,5 @@
 import {
   Column,
-  PrimaryColumn,
   ManyToOne,
   OneToOne,
   Entity,
