@@ -1,15 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ApiFile } from '../api-file.decorator';
-import { IsUUID } from 'class-validator';
+import { IsOptional, IsUUID } from 'class-validator';
 
 export class CreateLocationDTO {
   @ApiProperty()
   name: string;
-  @ApiProperty()
+  @ApiPropertyOptional()
   about: string;
-  @ApiProperty()
+  @ApiPropertyOptional()
   description: string;
-  @ApiProperty()
+  @ApiPropertyOptional()
   isHotel: boolean;
   @ApiProperty()
   countryId: string;
@@ -24,5 +24,6 @@ export class CreateLocationDTO {
   @ApiProperty({})
   categories: string;
   @ApiFile({ isArray: true })
+  @ApiPropertyOptional()
   images: Express.Multer.File[];
 }

@@ -39,6 +39,9 @@ export class Location {
   @Column({ default: false })
   isHotel: boolean;
 
+  @Column({ default: 0 })
+  reviewCount: number;
+
   @OneToMany(() => LocationImage, (locationImage) => locationImage.location)
   locationImages: LocationImage[];
 
@@ -56,7 +59,9 @@ export class Location {
   @JoinColumn()
   address: Address;
 
-  @ManyToMany(() => Category, (category) => category, { onUpdate: 'CASCADE' })
+  @ManyToMany(() => Category, (category) => category.locations, {
+    onUpdate: 'CASCADE',
+  })
   categories: Category[];
 
   @OneToMany(() => Review, (review) => review.location, { onUpdate: 'CASCADE' })
