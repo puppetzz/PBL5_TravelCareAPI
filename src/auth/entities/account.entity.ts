@@ -5,7 +5,7 @@ import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Account {
-  @PrimaryColumn({ length: 10 })
+  @PrimaryColumn()
   @ApiProperty()
   id: string;
 

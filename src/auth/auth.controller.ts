@@ -46,7 +46,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout(@Req() req: Request) {
     const payload = req.user;
-    return this.authService.logout(payload['id']);
+    return this.authService.logout(payload['accountId']);
   }
 
   @Post('/refresh')

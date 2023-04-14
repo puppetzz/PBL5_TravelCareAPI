@@ -12,8 +12,6 @@ import { IsDefined } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Location } from '../../locations/entities/location.entity';
 import { Review } from 'src/reviews/entities/review.entity';
-import { Exclude, Expose } from 'class-transformer';
-import { S3Service } from 'src/aws-s3/s3.service';
 
 @Entity()
 export class User {
@@ -47,9 +45,11 @@ export class User {
   phoneNumber: string;
 
   @Column({ nullable: true })
+  @ApiProperty()
   profileImage: string;
 
   @Column({ nullable: true })
+  @ApiProperty()
   coverImage: string;
 
   @Column({ nullable: true })
