@@ -24,7 +24,12 @@ export class UserService {
       },
       relations: {
         account: true,
-        address: true,
+        address: {
+          country: true,
+          province: true,
+          district: true,
+          ward: true,
+        },
       },
     });
 
