@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   MinLength,
 } from 'class-validator';
+import { isUndefined } from 'util';
 
 export class RegisterDto {
   @IsAlphanumeric()
