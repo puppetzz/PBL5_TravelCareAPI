@@ -150,35 +150,6 @@ export class AuthService {
     await this.accountRepository.update({ id: id }, { refreshTokenHash: hash });
   }
 
-  async getUser(id: string) {
-    return await this.userRepository.findOne({
-      where: {
-        accountId: id,
-      },
-      relations: {
-        account: true,
-        address: {
-          country: true,
-          province: true,
-          district: true,
-        },
-      },
-      select: {
-        accountId: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        phoneNumber: true,
-        role: true,
-        address: {
-          streetAddress: true,
-        },
-        account: {
-          username: true,
-        },
-      },
-    });
-  }
   hashData(data: string): string {
     return bcrypt.hash(data, 10);
   }

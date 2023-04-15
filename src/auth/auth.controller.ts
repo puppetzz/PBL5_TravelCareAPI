@@ -55,17 +55,9 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiSecurity('JWT-auth')
   refreshToken(
-    @GetCurrentAccount('id') id: string,
+    @GetCurrentAccount('accountId') id: string,
     @GetCurrentAccount('refreshToken') refreshToken: string,
   ) {
     return this.authService.refreshToken(id, refreshToken);
-  }
-
-  @ApiSecurity('JWT-auth')
-  @ApiOkResponse({ type: User })
-  @Get('/user/:id')
-  @UseGuards(AccessTokenGuard)
-  getUser(@Param('id') id: string) {
-    return this.authService.getUser(id);
   }
 }

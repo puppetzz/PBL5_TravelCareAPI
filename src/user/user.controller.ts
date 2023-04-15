@@ -35,7 +35,7 @@ export class UserController {
   @ApiSecurity('JWT-auth')
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(ClassSerializerInterceptor)
-  getCurrentUser(@GetCurrentAccount('acocuntId') id: string): Promise<User> {
+  getCurrentUser(@GetCurrentAccount('accountId') id: string): Promise<User> {
     return this.userService.getCurrentUser(id);
   }
 
