@@ -6,6 +6,7 @@ import { dataSourceOptions } from '../db/data-source';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { LocationModule } from './locations/location.module';
+import { CategoryModule } from './locations/category.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { LocationModule } from './locations/location.module';
     AddressModule,
     AuthModule,
     LocationModule,
+    CategoryModule,
   ],
 })
 export class AppModule {}

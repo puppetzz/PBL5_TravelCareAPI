@@ -27,11 +27,9 @@ import { defaultPage, defaultLimit } from '../constant/constant';
 import { CreateLocationDTO } from './dto/createLocationDTO';
 import { User } from 'src/user/entities/user.entity';
 import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decorator';
-import { AuthGuard } from '@nestjs/passport';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { FilesToBodyInterceptor } from './api-file.decorator';
-import { create } from 'domain';
 
 @Controller('locations')
 @ApiTags('location')
