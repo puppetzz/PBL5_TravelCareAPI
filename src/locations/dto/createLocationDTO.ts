@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ApiFile } from '../api-file.decorator';
-import { IsOptional, IsUUID } from 'class-validator';
 
 export class CreateLocationDTO {
   @ApiProperty()

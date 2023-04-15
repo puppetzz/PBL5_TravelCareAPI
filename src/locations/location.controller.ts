@@ -7,7 +7,6 @@ import {
   Logger,
   Post,
   Query,
-  UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -15,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { LocationService } from './location.service';
 import {
-  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiSecurity,
