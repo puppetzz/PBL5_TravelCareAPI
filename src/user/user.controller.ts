@@ -35,8 +35,8 @@ export class UserController {
   @ApiSecurity('JWT-auth')
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(ClassSerializerInterceptor)
-  getCurrentUser(@GetCurrentAccount() user: User): Promise<User> {
-    return this.userService.getCurrentUser(user);
+  getCurrentUser(@GetCurrentAccount('accountId') id: string): Promise<User> {
+    return this.userService.getCurrentUser(id);
   }
 
   @Patch('update-profile-image')

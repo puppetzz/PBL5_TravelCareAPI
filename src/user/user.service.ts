@@ -17,10 +17,10 @@ export class UserService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async getCurrentUser(user: User): Promise<User> {
-    const currentUser = await this.userRepository.findOne({
+  async getCurrentUser(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({
       where: {
-        accountId: user.accountId,
+        accountId: id,
       },
       relations: {
         account: true,
@@ -28,19 +28,18 @@ export class UserService {
       },
     });
 
-    const profileImage = currentUser.profileImage
-      ? await this.s3Service.generatePresignedUrl(currentUser.profileImage)
+    const profileImage = user.profileImage
+      ? await this.s3Service.generatePresignedUrl(user.profileImage)
       : null;
 
-    const coverImage = currentUser.coverImage
-      ? await this.s3Service.generatePresignedUrl(currentUser.coverImage)
+    const coverImage = user.coverImage
+      ? await this.s3Service.generatePresignedUrl(user.coverImage)
       : null;
 
-    currentUser.profileImage = profileImage;
-    currentUser.coverImage = coverImage;
-    console.log(user);
+    user.profileImage = profileImage;
+    user.coverImage = coverImage;
 
-    return currentUser;
+    return user;
   }
 
   async updateProfieImage(user: User, image: Express.Multer.File) {
