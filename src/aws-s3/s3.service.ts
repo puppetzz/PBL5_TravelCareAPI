@@ -1,16 +1,18 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
+import { UploadResult } from './types/upload-result.type';
 
 @Injectable()
 export class S3Service {
-  async uploadImage(image: Express.Multer.File): Promise<string> {
+  async uploadImage(image: Express.Multer.File): Promise<UploadResult> {
     if (!image) throw new BadRequestException('Image is required');
 
-    if (!image.mimetype.includes('image'))
+    if (!image?.mimetype.includes('image'))
       throw new BadRequestException('This file must be an image');
 
     const s3 = new S3();
+    console.log(image.filename);
 
     const uploadResult = await s3
       .upload({
@@ -21,15 +23,20 @@ export class S3Service {
       })
       .promise();
 
-    return uploadResult.Key;
+    return {
+      key: uploadResult.Key,
+      url: uploadResult.Location,
+    };
   }
 
   async deleteImage(key: string): Promise<void> {
     const s3 = new S3();
-    await s3.deleteObject({
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: key,
-    });
+    await s3
+      .deleteObject({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+      })
+      .promise();
   }
 
   async generatePresignedUrl(key: string): Promise<string> {
@@ -37,7 +44,8 @@ export class S3Service {
 
     return s3.getSignedUrlPromise('getObject', {
       Bucket: process.env.S3_BUCKET_NAME,
-      key: key,
+      Key: key,
+      Expires: 3600 * 3600,
     });
   }
 }

@@ -13,6 +13,7 @@ import { Address } from '../../address/entities/address.entity';
 import { Category } from './category.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Review } from 'src/reviews/entities/review.entity';
+import { LocationImage } from './location-image.entity';
 
 @Entity()
 export class Location {
@@ -30,13 +31,19 @@ export class Location {
 
   @Column({ nullable: true })
   @ApiProperty()
-  About: string;
+  about: string;
 
   @Column({ nullable: true })
   description: string;
 
   @Column({ default: false })
   isHotel: boolean;
+
+  @Column({ default: 0 })
+  reviewCount: number;
+
+  @OneToMany(() => LocationImage, (locationImage) => locationImage.location)
+  locationImages: LocationImage[];
 
   @ManyToOne(() => User, (user) => user.locations, {
     nullable: true,
@@ -52,7 +59,9 @@ export class Location {
   @JoinColumn()
   address: Address;
 
-  @ManyToMany(() => Category, (category) => category, { onUpdate: 'CASCADE' })
+  @ManyToMany(() => Category, (category) => category.locations, {
+    onUpdate: 'CASCADE',
+  })
   categories: Category[];
 
   @OneToMany(() => Review, (review) => review.location, { onUpdate: 'CASCADE' })

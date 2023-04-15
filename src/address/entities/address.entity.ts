@@ -1,4 +1,10 @@
-import { Column, PrimaryColumn, ManyToOne, OneToOne, Entity } from 'typeorm';
+import {
+  Column,
+  ManyToOne,
+  OneToOne,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Country } from './country.entity';
 import { Province } from './province.entity';
 import { District } from './district.entity';
@@ -10,7 +16,7 @@ import { Ward } from './ward.entity';
 
 @Entity()
 export class Address {
-  @PrimaryColumn({ length: 10 })
+  @PrimaryGeneratedColumn('uuid')
   @ApiProperty()
   id: string;
 

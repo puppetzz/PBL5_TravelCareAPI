@@ -42,6 +42,9 @@ export class RegisterDto {
   districtId: string;
 
   @ApiProperty({ required: false })
+  wardId: string;
+
+  @ApiProperty({ required: false })
   streetAddress: string;
 
   @ApiProperty({ required: false })

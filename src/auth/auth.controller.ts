@@ -46,7 +46,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout(@Req() req: Request) {
     const payload = req.user;
-    return this.authService.logout(payload['sub']);
+    return this.authService.logout(payload['accountId']);
   }
 
   @Post('/refresh')
@@ -55,7 +55,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiSecurity('JWT-auth')
   refreshToken(
-    @GetCurrentAccount('sub') id: string,
+    @GetCurrentAccount('id') id: string,
     @GetCurrentAccount('refreshToken') refreshToken: string,
   ) {
     return this.authService.refreshToken(id, refreshToken);

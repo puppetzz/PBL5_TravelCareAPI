@@ -9,7 +9,6 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { Address } from '../address/entities/address.entity';
 import { AddressService } from '../address/address.service';
 import { LoginDto } from './dto/login.dto';
@@ -18,6 +17,7 @@ import { Tokens } from './types/tokens.type';
 import { config } from 'dotenv';
 import { LoginResponse } from './types/login-response.type';
 import { S3Service } from '../aws-s3/s3.service';
+import { v4 as uuid } from 'uuid';
 
 config();
 
@@ -33,8 +33,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const id = this.generateUniqueId();
-
+    const id = uuid();
     const hash = await this.hashData(registerDto.password);
 
     if (
@@ -74,6 +73,7 @@ export class AuthService {
         registerDto.countryId,
         registerDto.provinceId,
         registerDto.districtId,
+        registerDto.wardId,
         registerDto.streetAddress,
       );
       newUser.address = address;
@@ -104,12 +104,6 @@ export class AuthService {
     const tokens = await this.getTokens(account.id, account.username);
     await this.updateRefreshTokenHash(account.id, tokens.refreshToken);
 
-    const currentUser = await this.userRepository.findOne({
-      where: {
-        accountId: account.id,
-      },
-    });
-
     return {
       user: {
         username: account.username,
@@ -137,8 +131,6 @@ export class AuthService {
         id: id,
       },
     });
-
-    console.log(account);
 
     if (!account) throw new ForbiddenException('Access denied!');
 
@@ -195,7 +187,7 @@ export class AuthService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: id,
+          id: id,
           username,
         },
         {
@@ -204,7 +196,7 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: id,
+          id: id,
           username,
         },
         {
@@ -218,12 +210,5 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  generateUniqueId() {
-    const id = BigInt(`0x${uuidv4().replace(/-/g, '')}`)
-      .toString()
-      .slice(0, 10);
-    return id;
   }
 }

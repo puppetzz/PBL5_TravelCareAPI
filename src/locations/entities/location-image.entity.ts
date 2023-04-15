@@ -1,11 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Review } from './review.entity';
+import { Location } from './location.entity';
 
 @Entity()
-export class ReviewImage {
+export class LocationImage {
   @PrimaryGeneratedColumn()
-  @ApiProperty()
   id: string;
 
   @Column()
@@ -14,9 +12,10 @@ export class ReviewImage {
   @Column()
   imageUrl: string;
 
-  @ManyToOne(() => Review, (review) => review.reviewImages, {
+  @ManyToOne(() => Location, (location) => location.locationImages, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
+    nullable: false,
   })
-  review: Review;
+  location: Location;
 }

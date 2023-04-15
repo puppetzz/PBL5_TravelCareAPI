@@ -5,11 +5,14 @@ import { Country } from './entities/country.entity';
 import { District } from './entities/district.entity';
 import { Province } from './entities/province.entity';
 import { AddressService } from './address.service';
+import { Ward } from './entities/ward.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Address, Country, District, Province])],
+  imports: [
+    TypeOrmModule.forFeature([Address, Country, District, Province, Ward]),
+  ],
   exports: [
-    TypeOrmModule.forFeature([Address, Country, District, Province]),
+    TypeOrmModule.forFeature([Address, Country, District, Province, Ward]),
     AddressService,
   ],
   providers: [AddressService],
