@@ -6,6 +6,7 @@ import { District } from './entities/district.entity';
 import { Province } from './entities/province.entity';
 import { AddressService } from './address.service';
 import { Ward } from './entities/ward.entity';
+import { AddressController } from './address.controller';
 
 @Module({
   imports: [
@@ -16,5 +17,6 @@ import { Ward } from './entities/ward.entity';
     AddressService,
   ],
   providers: [AddressService],
+  controllers: [AddressController],
 })
 export class AddressModule {}

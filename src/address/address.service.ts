@@ -174,4 +174,42 @@ export class AddressService {
 
     return await this.addressRepository.save(address);
   }
+
+  async getAllCountry(): Promise<Country[]> {
+    const countries = await this.countryRepository.find();
+    return countries;
+  }
+
+  async getProvinceByCountry(countryId: string): Promise<Province[]> {
+    const country = await this.countryRepository.findOneBy({ id: countryId });
+    return await this.provinceRepository.findBy({ country: country });
+  }
+
+  async getDistrictByProvince(provinceId: string): Promise<District[]> {
+    const province = await this.provinceRepository.findOneBy({
+      id: provinceId,
+    });
+    return await this.districtRepository.findBy({ province: province });
+  }
+
+  async getWardByDistrict(districtId: string): Promise<Ward[]> {
+    const district = await this.districtRepository.findOneBy({
+      id: districtId,
+    });
+    return await this.wardRepository.findBy({ district: district });
+  }
+
+  async getAll(): Promise<Country[]> {
+    const countries = await this.countryRepository.find({
+      relations: {
+        provinces: {
+          districts: {
+            wards: true,
+          },
+        },
+      },
+    });
+
+    return countries;
+  }
 }
