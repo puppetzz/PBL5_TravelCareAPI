@@ -61,8 +61,8 @@ export class AuthService {
       account: newAccount,
       email: registerDto.email,
       firstName: registerDto.firstName ? registerDto.firstName : null,
-      lastName: registerDto.lastName ? registerDto.firstName : null,
-      phoneNumber: registerDto.phoneNumber ? registerDto.firstName : null,
+      lastName: registerDto.lastName ? registerDto.lastName : null,
+      phoneNumber: registerDto.phoneNumber ? registerDto.phoneNumber : null,
     });
 
     if (
