@@ -32,10 +32,6 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     }
     const user = await this.userRepository.findOne({
       where: { account },
-      relations: {
-        account: true,
-        address: true,
-      },
     });
 
     return user;
