@@ -120,4 +120,8 @@ export class LocationService {
 
     return newLocation;
   }
+
+  async getAllCategories(): Promise<Category[]> {
+    return this.categoryRepository.find();
+  }
 }
