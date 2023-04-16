@@ -84,9 +84,9 @@ export class AddressService {
 
   async updateAddress(
     addressId: string,
-    countryid: string | null | undefined,
-    provinceid: string | null | undefined,
-    districtid: string | null | undefined,
+    countryId: string | null | undefined,
+    provinceId: string | null | undefined,
+    districtId: string | null | undefined,
     wardId: string | null | undefined,
     streetAddress: string | null | undefined,
   ): Promise<Address> {
@@ -109,22 +109,22 @@ export class AddressService {
       },
     });
 
-    if (countryid) {
+    if (countryId) {
       const country = await this.countryRepository.findOneOrFail({
-        where: { id: countryid },
+        where: { id: countryId },
       });
 
       if (!country) throw new BadRequestException('Country not exist!');
 
-      if (!!country && address.country.id != countryid) {
+      if (!!country && address.country.id != countryId) {
         address.country = country;
       }
     }
 
-    if (provinceid) {
+    if (provinceId) {
       const province = await this.provinceRepository.findOne({
         where: {
-          id: provinceid,
+          id: provinceId,
           country: address.country,
         },
       });
@@ -132,15 +132,15 @@ export class AddressService {
       if (!province)
         throw new BadRequestException('Province must be in the country');
 
-      if (!!province && address.province.id != provinceid) {
+      if (!!province && address.province.id != provinceId) {
         address.province = province;
       }
     }
 
-    if (districtid) {
+    if (districtId) {
       const district = await this.districtRepository.findOne({
         where: {
-          id: districtid,
+          id: districtId,
           province: address.province,
         },
       });
@@ -148,7 +148,7 @@ export class AddressService {
       if (!district)
         throw new BadRequestException('District must be in the provinces');
 
-      if (!!district && address.district.id != districtid) {
+      if (!!district && address.district.id != districtId) {
         address.district = district;
       }
     }
@@ -168,7 +168,7 @@ export class AddressService {
       }
     }
 
-    if (streetAddress) {
+    if (streetAddress !== null && streetAddress !== undefined) {
       address.streetAddress = streetAddress;
     }
 
