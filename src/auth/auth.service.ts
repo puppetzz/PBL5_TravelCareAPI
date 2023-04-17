@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Account } from './entities/account.entity';
@@ -92,14 +93,20 @@ export class AuthService {
       },
     });
 
-    if (!account) throw new BadRequestException('Username does not exist!');
+    if (!account)
+      throw new UnauthorizedException(
+        'Username does not exist or wrong password!',
+      );
 
     const passwordMatches = await bcrypt.compareSync(
       loginDto.password,
       account.passwordHash,
     );
 
-    if (!passwordMatches) throw new ForbiddenException('Access denied');
+    if (!passwordMatches)
+      throw new UnauthorizedException(
+        'Username does not exist or wrong password!',
+      );
 
     const tokens = await this.getTokens(account.id, account.username);
     await this.updateRefreshTokenHash(account.id, tokens.refreshToken);
