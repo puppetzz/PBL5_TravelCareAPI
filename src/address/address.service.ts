@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Address } from './entities/address.entity';
 import { Repository } from 'typeorm';
@@ -29,54 +25,72 @@ export class AddressService {
     provinceId: string,
     districtId: string,
     wardId: string,
-    streetAddress: string,
+    streetAddress: string | null,
   ): Promise<Address> {
     if (!countryId)
       throw new BadRequestException('Country is required to create address');
-
-    if (!provinceId)
-      throw new BadRequestException('Province is required to create address');
-
-    if (!districtId)
-      throw new BadRequestException('District is required to create address');
-
-    if (!wardId)
-      throw new BadRequestException('Ward is required to create address');
 
     const country = await this.countryRepository.findOne({
       where: { id: countryId },
     });
     if (!country) {
-      throw new NotFoundException(`country ${countryId} not found`);
-    }
-    const province = await this.provinceRepository.findOne({
-      where: { id: provinceId },
-    });
-    if (!province) {
-      throw new NotFoundException(`province ${provinceId} not found`);
+      throw new BadRequestException(
+        `country with countryId ${countryId} is not exist`,
+      );
     }
 
-    const district = await this.districtRepository.findOne({
-      where: { id: districtId },
-    });
-    if (!district) {
-      throw new NotFoundException(`district ${districtId} not found`);
-    }
-
-    const ward = await this.wardRepository.findOne({
-      where: { id: wardId },
-    });
-
-    if (!ward) {
-      throw new NotFoundException(`ward ${wardId} not found`);
-    }
     const newAddress = await this.addressRepository.create({
       country,
-      province,
-      district,
-      ward,
       streetAddress,
     });
+
+    if (provinceId) {
+      const province = await this.provinceRepository.findOneBy({
+        id: provinceId,
+      });
+
+      if (!province)
+        throw new BadRequestException(
+          `Province with id ${provinceId} is not exist`,
+        );
+
+      newAddress.province = province;
+    }
+
+    if (districtId) {
+      if (!provinceId && !newAddress.province)
+        throw new BadRequestException(
+          'Province should not be null when add district',
+        );
+
+      const district = await this.districtRepository.findOneBy({
+        id: districtId,
+      });
+
+      if (!district)
+        throw new BadRequestException(
+          `District with id ${districtId} is not exist`,
+        );
+
+      newAddress.district = district;
+    }
+    if (wardId) {
+      if (!districtId && !newAddress.district)
+        throw new BadRequestException(
+          'District should not be null when add ward',
+        );
+
+      const ward = await this.wardRepository.findOneBy({
+        id: wardId,
+      });
+
+      if (!ward)
+        throw new BadRequestException(
+          `Province with id ${wardId} is not exist`,
+        );
+
+      newAddress.ward = ward;
+    }
 
     await this.addressRepository.save(newAddress);
     return newAddress;
@@ -122,6 +136,11 @@ export class AddressService {
     }
 
     if (provinceId) {
+      if (!address.country)
+        throw new BadRequestException(
+          'Country is required when update province',
+        );
+
       const province = await this.provinceRepository.findOne({
         where: {
           id: provinceId,
@@ -132,12 +151,17 @@ export class AddressService {
       if (!province)
         throw new BadRequestException('Province must be in the country');
 
-      if (!!province && address.province.id != provinceId) {
+      if (!!province && address.province?.id != provinceId) {
         address.province = province;
       }
     }
 
     if (districtId) {
+      if (!address.province)
+        throw new BadRequestException(
+          'Provice is requeired when update district',
+        );
+
       const district = await this.districtRepository.findOne({
         where: {
           id: districtId,
@@ -148,12 +172,15 @@ export class AddressService {
       if (!district)
         throw new BadRequestException('District must be in the provinces');
 
-      if (!!district && address.district.id != districtId) {
+      if (!!district && address.district?.id != districtId) {
         address.district = district;
       }
     }
 
     if (wardId) {
+      if (!address.district)
+        throw new BadRequestException('District is required when update ward');
+
       const ward = await this.wardRepository.findOne({
         where: {
           id: wardId,
@@ -163,14 +190,33 @@ export class AddressService {
 
       if (!ward) throw new BadRequestException('ward must be in the district');
 
-      if (!!ward && address.ward.id != wardId) {
+      if (!!ward && address.ward?.id != wardId) {
         address.ward = ward;
       }
+    }
+
+    if (!wardId) {
+      address.ward = null;
+    }
+
+    if (!districtId) {
+      if (address.ward) throw new BadRequestException('District is required');
+      address.district = null;
+    }
+
+    if (!provinceId) {
+      if (address.ward) throw new BadRequestException('Province is required');
+      if (address.district)
+        throw new BadRequestException('Province is required');
+
+      address.province = null;
     }
 
     if (streetAddress !== null && streetAddress !== undefined) {
       address.streetAddress = streetAddress;
     }
+
+    if (!streetAddress) address.streetAddress = null;
 
     return await this.addressRepository.save(address);
   }

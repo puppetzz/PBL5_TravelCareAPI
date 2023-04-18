@@ -109,14 +109,7 @@ export class UserService {
       user.address = address;
     }
 
-    if (
-      !user.address &&
-      !!updateUserDto.countryId &&
-      !!updateUserDto.provinceId &&
-      !!updateUserDto.districtId &&
-      !!updateUserDto.wardId &&
-      !!updateUserDto.streetAddress
-    ) {
+    if (!user.address && !!updateUserDto.countryId) {
       const address = await this.addressService.createAddress(
         updateUserDto.countryId,
         updateUserDto.provinceId,

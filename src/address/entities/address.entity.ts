@@ -34,9 +34,8 @@ export class Address {
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    nullable: false,
+    nullable: true,
   })
-  @IsNotEmpty({ message: 'Province should not empty' })
   @ApiProperty({ type: () => Province })
   province: Province;
 
@@ -44,9 +43,8 @@ export class Address {
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    nullable: false,
+    nullable: true,
   })
-  @IsNotEmpty({ message: 'District should not empty' })
   @ApiProperty({ type: () => District })
   district: District;
 
@@ -54,13 +52,12 @@ export class Address {
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    nullable: false,
+    nullable: true,
   })
-  @IsNotEmpty({ message: 'Ward should not empty' })
   @ApiProperty({ type: () => Ward })
   ward: Ward;
 
-  @Column()
+  @Column({ nullable: true })
   @ApiProperty()
   streetAddress: string;
 
