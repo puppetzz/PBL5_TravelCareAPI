@@ -55,7 +55,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @ApiSecurity('JWT-auth')
   refreshToken(
-    @GetCurrentAccount('accountId') id: string,
+    @GetCurrentAccount('sub') id: string,
     @GetCurrentAccount('refreshToken') refreshToken: string,
   ) {
     return this.authService.refreshToken(id, refreshToken);
