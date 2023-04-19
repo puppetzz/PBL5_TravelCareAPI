@@ -47,6 +47,7 @@ export class AddressService {
     if (provinceId) {
       const province = await this.provinceRepository.findOneBy({
         id: provinceId,
+        country: country,
       });
 
       if (!province)
@@ -65,6 +66,7 @@ export class AddressService {
 
       const district = await this.districtRepository.findOneBy({
         id: districtId,
+        province: newAddress.province,
       });
 
       if (!district)
@@ -74,6 +76,7 @@ export class AddressService {
 
       newAddress.district = district;
     }
+
     if (wardId) {
       if (!districtId && !newAddress.district)
         throw new BadRequestException(
@@ -82,6 +85,7 @@ export class AddressService {
 
       const ward = await this.wardRepository.findOneBy({
         id: wardId,
+        district: newAddress.district,
       });
 
       if (!ward)
@@ -219,6 +223,10 @@ export class AddressService {
     if (!streetAddress) address.streetAddress = null;
 
     return await this.addressRepository.save(address);
+  }
+
+  async deleteAddress(id: string): Promise<void> {
+    await this.addressRepository.delete(id);
   }
 
   async getAllCountry(): Promise<Country[]> {

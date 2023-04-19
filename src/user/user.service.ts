@@ -109,6 +109,11 @@ export class UserService {
       user.address = address;
     }
 
+    if (user.address && !updateUserDto.countryId) {
+      await this.addressService.deleteAddress(user.address.id);
+      user.address = null;
+    }
+
     if (!user.address && !!updateUserDto.countryId) {
       const address = await this.addressService.createAddress(
         updateUserDto.countryId,
