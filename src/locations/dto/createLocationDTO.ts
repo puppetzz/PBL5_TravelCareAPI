@@ -3,26 +3,26 @@ import { ApiFile } from '../api-file.decorator';
 
 export class CreateLocationDTO {
   @ApiProperty()
-  name: string;
+  name?: string;
   @ApiPropertyOptional()
-  about: string;
+  about?: string;
   @ApiPropertyOptional()
-  description: string;
+  description?: string;
   @ApiPropertyOptional()
-  isHotel: boolean;
+  isHotel?: boolean;
   @ApiProperty()
-  countryId: string;
+  countryId?: string;
   @ApiProperty()
-  provinceId: string;
+  provinceId?: string;
   @ApiProperty()
-  districtId: string;
+  districtId?: string;
   @ApiProperty()
-  wardId: string;
+  wardId?: string;
   @ApiProperty()
-  streetAddress: string;
+  streetAddress?: string;
   @ApiProperty({})
-  categories: string;
+  categories?: string;
   @ApiFile({ isArray: true })
   @ApiPropertyOptional()
-  images: Express.Multer.File[];
+  images?: Express.Multer.File[];
 }

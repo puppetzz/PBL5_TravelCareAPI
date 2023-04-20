@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Location } from './entities/location.entity';
@@ -10,6 +10,8 @@ import { S3Service } from '../aws-s3/s3.service';
 import { Category } from './entities/category.entity';
 import { AddressService } from 'src/address/address.service';
 import { LocationImage } from './entities/location-image.entity';
+import { UpdateLocationDto } from './dto/updateLocation.dto';
+import { Console } from 'console';
 @Injectable()
 export class LocationService {
   constructor(
@@ -103,7 +105,6 @@ export class LocationService {
     });
     await this.locationRepository.save(newLocation);
     const locationImages = [];
-
     for (const image of images) {
       const { key, url } = await this.s3Service.uploadImage(image);
       const locationImage = await this.locationImageRepository.create({
@@ -120,8 +121,113 @@ export class LocationService {
 
     return newLocation;
   }
+  async updateLocation(
+    updateLocationDto: UpdateLocationDto,
+    locationId: string,
+  ): Promise<Location> {
+    const updateLocation = await this.locationRepository.findOne({
+      where: {
+        id: locationId,
+      },
+      relations: ['address', 'locationImages', 'categories'],
+    });
+    const {
+      name,
+      about,
+      description,
+      isHotel,
+      categories,
+      countryId,
+      provinceId,
+      districtId,
+      wardId,
+      streetAddress,
+      currentImages,
+      images,
+    } = updateLocationDto;
+    console.log(isHotel, typeof isHotel);
 
-  async getAllCategories(): Promise<Category[]> {
-    return this.categoryRepository.find();
+    if (!updateLocation) {
+      throw new NotFoundException(`Location ${locationId} not found`);
+    }
+    if (categories) {
+      const categoriesArray = categories.split(',');
+      if (categoriesArray.length) {
+        const categories = await this.categoryRepository.findBy({
+          id: In(categoriesArray.map((string) => parseInt(string))),
+        });
+        if (categories) {
+          updateLocation.categories = categories;
+        }
+      }
+    }
+
+    const addressId = updateLocation.address.id;
+    const updateAddress = await this.addressService.updateAddress(
+      addressId,
+      countryId,
+      provinceId,
+      districtId,
+      wardId,
+      streetAddress,
+    );
+    if (name) {
+      updateLocation.name = name;
+    }
+    if (about) {
+      updateLocation.about = about;
+    }
+    if (description) {
+      updateLocation.description = description;
+    }
+    if (isHotel) {
+      updateLocation.isHotel = isHotel;
+    }
+    updateLocation.address = updateAddress;
+
+    await this.locationRepository.save(updateLocation);
+    if (currentImages) {
+      const currentImagesArray = updateLocationDto.currentImages?.split(',');
+      if (currentImagesArray) {
+        const currentImages = await this.locationImageRepository.findBy({
+          imageUrl: In(currentImagesArray),
+        });
+        function isInImages(image: LocationImage) {
+          for (const imageCurrent of currentImages) {
+            if (image.id === imageCurrent.id) {
+              return true;
+            }
+          }
+          return false;
+        }
+        const deleteImages = updateLocation.locationImages.filter(
+          (image) => !isInImages(image),
+        );
+        await this.locationImageRepository.remove(deleteImages);
+      }
+    }
+    if (images) {
+      for (const image of images) {
+        const { key, url } = await this.s3Service.uploadImage(image);
+        const locationImage = await this.locationImageRepository.create({
+          imageKey: key,
+          imageUrl: url,
+          location: updateLocation,
+        });
+        await this.locationImageRepository.save(locationImage);
+      }
+    }
+    const newLocation = await this.locationRepository
+      .createQueryBuilder('location')
+      .leftJoinAndSelect('location.categories', 'category')
+      .leftJoinAndSelect('location.locationImages', 'locationImage')
+      .innerJoinAndSelect('location.address', 'address')
+      .innerJoinAndSelect('address.country', 'country')
+      .innerJoinAndSelect('address.province', 'province')
+      .innerJoinAndSelect('address.district', 'district')
+      .innerJoinAndSelect('address.ward', 'ward')
+      .getOne();
+
+    return newLocation;
   }
 }
