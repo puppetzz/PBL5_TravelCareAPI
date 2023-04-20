@@ -3,8 +3,8 @@ import { Location } from './location.entity';
 
 @Entity()
 export class LocationImage {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   imageKey: string;

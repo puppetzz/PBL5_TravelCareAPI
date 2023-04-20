@@ -3,8 +3,8 @@ import { Hotel } from './hotel.entity';
 
 @Entity()
 export class Language {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ nullable: false })
   name: string;

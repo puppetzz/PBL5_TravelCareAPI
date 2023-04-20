@@ -4,7 +4,7 @@ import { Review } from './review.entity';
 
 @Entity()
 export class TripType {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   @ApiProperty()
   id: string;
 
