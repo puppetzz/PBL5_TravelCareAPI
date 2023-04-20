@@ -14,6 +14,7 @@ import { Category } from './category.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Review } from 'src/reviews/entities/review.entity';
 import { LocationImage } from './location-image.entity';
+import { Hotel } from 'src/hotels/entities/hotel.entity';
 
 @Entity()
 export class Location {
@@ -66,4 +67,7 @@ export class Location {
 
   @OneToMany(() => Review, (review) => review.location, { onUpdate: 'CASCADE' })
   reviews: Review[];
+
+  @OneToOne(() => Hotel, (hotel) => hotel.location)
+  hotel: Hotel;
 }
