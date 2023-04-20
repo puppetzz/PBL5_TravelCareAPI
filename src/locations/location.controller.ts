@@ -5,6 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -28,6 +30,8 @@ import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decor
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FilesToBodyInterceptor } from './api-file.decorator';
+import { UpdateLocationDto } from './dto/updateLocation.dto';
+import { type } from 'os';
 
 @Controller('locations')
 @ApiTags('location')
@@ -42,6 +46,7 @@ export class LocationController {
     const { page = defaultPage, limit = defaultLimit } = filterDto;
     return this.locationService.getLocations({ ...filterDto, page, limit });
   }
+
   @UseGuards(AccessTokenGuard)
   @ApiSecurity('JWT-auth')
   @HttpCode(HttpStatus.OK)
@@ -55,5 +60,15 @@ export class LocationController {
     @GetCurrentAccount() user: User,
   ): Promise<Location> {
     return this.locationService.createLocation(createLocationDTO, user);
+  }
+  @Patch('/:locationId')
+  @UsePipes(ValidationPipe)
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('images'), FilesToBodyInterceptor)
+  updateLocation(
+    @Body() updateLocationDto: UpdateLocationDto,
+    @Param('locationId') locationId: string,
+  ) {
+    return this.locationService.updateLocation(updateLocationDto, locationId);
   }
 }
