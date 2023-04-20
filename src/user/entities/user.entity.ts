@@ -12,6 +12,8 @@ import { IsDefined } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Location } from '../../locations/entities/location.entity';
 import { Review } from 'src/reviews/entities/review.entity';
+import { Booking } from 'src/booking/entities/booking.entity';
+import { Receipt } from 'src/booking/entities/reciept.entity';
 
 @Entity()
 export class User {
@@ -81,4 +83,10 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.user, { onUpdate: 'CASCADE' })
   reviews: Review[];
+
+  @OneToMany(() => Booking, (booking) => booking.user)
+  booking: Booking[];
+
+  @OneToMany(() => Receipt, (receipt) => receipt.user)
+  receipts: Receipt[];
 }

@@ -12,7 +12,7 @@ import { Location } from '../../locations/entities/location.entity';
 export class Category {
   @PrimaryGeneratedColumn()
   @ApiProperty()
-  id: string;
+  id: number;
 
   @Column()
   @ApiProperty()

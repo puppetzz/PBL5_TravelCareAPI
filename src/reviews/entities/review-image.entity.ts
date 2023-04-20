@@ -4,7 +4,7 @@ import { Review } from './review.entity';
 
 @Entity()
 export class ReviewImage {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   @ApiProperty()
   id: string;
 
