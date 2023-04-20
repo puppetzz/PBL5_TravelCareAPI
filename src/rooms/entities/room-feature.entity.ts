@@ -3,8 +3,8 @@ import { Room } from './rom.entity';
 
 @Entity()
 export class RoomFeature {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ nullable: false })
   name: string;

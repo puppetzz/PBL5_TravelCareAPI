@@ -3,8 +3,8 @@ import { RoomBed } from './room-bed.entity';
 
 @Entity()
 export class Bed {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ nullable: false })
   type: string;

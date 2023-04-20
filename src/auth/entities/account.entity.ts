@@ -17,6 +17,14 @@ export class Account {
   @Exclude()
   passwordHash: string;
 
+  @Column({ nullable: false })
+  @Exclude()
+  passwordSalt: string;
+
+  @Column({ nullable: false })
+  @Exclude()
+  iv: string;
+
   @Column({ default: false })
   @Exclude()
   isVerified: boolean;
@@ -32,6 +40,10 @@ export class Account {
   @Column({ nullable: true })
   @Exclude()
   refreshTokenHash: string;
+
+  @Column({ nullable: true })
+  @Exclude()
+  refreshTokenSalt: string;
 
   @OneToOne(() => User, (user) => user.account, { onDelete: 'CASCADE' })
   user: User;
