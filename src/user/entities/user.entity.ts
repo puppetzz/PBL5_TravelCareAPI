@@ -52,6 +52,7 @@ export class User {
   profileImage: string;
 
   @Column({ nullable: true })
+  @ApiProperty()
   profileImageUrl: string;
 
   @Column({ nullable: true })
