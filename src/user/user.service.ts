@@ -33,17 +33,6 @@ export class UserService {
       },
     });
 
-    const profileImage = user.profileImage
-      ? await this.s3Service.generatePresignedUrl(user.profileImage)
-      : null;
-
-    const coverImage = user.coverImage
-      ? await this.s3Service.generatePresignedUrl(user.coverImage)
-      : null;
-
-    user.profileImage = profileImage;
-    user.coverImage = coverImage;
-
     return user;
   }
 
@@ -58,7 +47,10 @@ export class UserService {
 
     await this.userRepository.update(
       { accountId: user.accountId },
-      { profileImage: key },
+      {
+        profileImage: key,
+        profileImageUrl: url,
+      },
     );
 
     return url;
@@ -73,7 +65,10 @@ export class UserService {
 
     await this.userRepository.update(
       { accountId: user.accountId },
-      { coverImage: key },
+      {
+        coverImage: key,
+        coverImageUrl: url,
+      },
     );
 
     return url;
@@ -126,18 +121,6 @@ export class UserService {
     }
 
     const userUpdated = await this.userRepository.save(user);
-
-    if (userUpdated.profileImage) {
-      userUpdated.profileImage = await this.s3Service.generatePresignedUrl(
-        userUpdated.profileImage,
-      );
-    }
-
-    if (userUpdated.coverImage) {
-      userUpdated.coverImage = await this.s3Service.generatePresignedUrl(
-        userUpdated.coverImage,
-      );
-    }
 
     return userUpdated;
   }
