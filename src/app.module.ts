@@ -10,6 +10,7 @@ import { CategoryModule } from './locations/category.module';
 import { HotelModule } from './hotels/hotels.module';
 import { RoomModule } from './rooms/roms.module';
 import { BookingModule } from './booking/booking.module';
+import { ReviewModule } from './reviews/review.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { BookingModule } from './booking/booking.module';
     HotelModule,
     RoomModule,
     BookingModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}

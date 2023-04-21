@@ -25,7 +25,10 @@ export class Review {
 
   @Column({ default: new Date().toISOString() })
   @ApiProperty()
-  reviewDate: Date;
+  reviewAt: Date;
+
+  @Column({ nullable: true })
+  updateAt: Date;
 
   @Column({ nullable: false })
   @ApiProperty()

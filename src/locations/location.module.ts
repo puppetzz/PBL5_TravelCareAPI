@@ -23,5 +23,6 @@ import { LocationImage } from './entities/location-image.entity';
   ],
   controllers: [LocationController],
   providers: [LocationService],
+  exports: [TypeOrmModule.forFeature([Location, Category, LocationImage])],
 })
 export class LocationModule {}
