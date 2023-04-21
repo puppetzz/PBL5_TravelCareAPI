@@ -14,6 +14,7 @@ import { Location } from '../../locations/entities/location.entity';
 import { Review } from 'src/reviews/entities/review.entity';
 import { Booking } from 'src/booking/entities/booking.entity';
 import { Receipt } from 'src/booking/entities/reciept.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -47,12 +48,19 @@ export class User {
   phoneNumber: string;
 
   @Column({ nullable: true })
-  @ApiProperty()
+  @Exclude()
   profileImage: string;
 
   @Column({ nullable: true })
-  @ApiProperty()
+  profileImageUrl: string;
+
+  @Column({ nullable: true })
+  @Exclude()
   coverImage: string;
+
+  @Column({ nullable: true })
+  @ApiProperty()
+  coverImageUrl: string;
 
   @Column({ nullable: true })
   @ApiProperty()
