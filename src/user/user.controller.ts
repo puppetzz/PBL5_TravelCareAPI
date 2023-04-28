@@ -84,7 +84,7 @@ export class UserController {
     @UploadedFile() image: Express.Multer.File,
     @GetCurrentAccount() user: User,
   ): Promise<string> {
-    return this.userService.updateProfieImage(user, image);
+    return this.userService.updateCoverImage(user, image);
   }
 
   @Patch('update-user')
