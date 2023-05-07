@@ -15,6 +15,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Review } from 'src/reviews/entities/review.entity';
 import { LocationImage } from './location-image.entity';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
+import { WishList } from 'src/wishlists/wishList.entity';
 
 @Entity()
 export class Location {
@@ -67,6 +68,9 @@ export class Location {
 
   @OneToMany(() => Review, (review) => review.location, { onUpdate: 'CASCADE' })
   reviews: Review[];
+
+  @OneToMany(() => WishList, (wishList) => wishList.location)
+  wishList: WishList[];
 
   @OneToOne(() => Hotel, (hotel) => hotel.location)
   hotel: Hotel;

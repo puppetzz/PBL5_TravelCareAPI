@@ -15,6 +15,7 @@ import { Review } from 'src/reviews/entities/review.entity';
 import { Booking } from 'src/booking/entities/booking.entity';
 import { Receipt } from 'src/booking/entities/reciept.entity';
 import { Exclude } from 'class-transformer';
+import { WishList } from 'src/wishlists/wishList.entity';
 
 @Entity()
 export class User {
@@ -98,4 +99,7 @@ export class User {
 
   @OneToMany(() => Receipt, (receipt) => receipt.user)
   receipts: Receipt[];
+
+  @OneToMany(() => WishList, (wishList) => wishList.user)
+  wishList: WishList[];
 }
