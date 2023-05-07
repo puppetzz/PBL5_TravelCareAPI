@@ -11,6 +11,7 @@ import { HotelModule } from './hotels/hotels.module';
 import { RoomModule } from './rooms/roms.module';
 import { BookingModule } from './booking/booking.module';
 import { ReviewModule } from './reviews/review.module';
+import { WishlistModule } from './wishlists/wishList.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ReviewModule } from './reviews/review.module';
     RoomModule,
     BookingModule,
     ReviewModule,
+    WishlistModule,
   ],
 })
 export class AppModule {}
