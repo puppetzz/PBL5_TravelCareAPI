@@ -4,14 +4,8 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class WishList {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  userAccountId: string;
-
-  @Column()
-  locationId: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ManyToOne(() => User, (user) => user.wishList)
   user: User;
