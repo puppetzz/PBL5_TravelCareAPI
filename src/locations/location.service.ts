@@ -105,15 +105,17 @@ export class LocationService {
     });
     await this.locationRepository.save(newLocation);
     const locationImages = [];
-    for (const image of images) {
-      const { key, url } = await this.s3Service.uploadImage(image);
-      const locationImage = await this.locationImageRepository.create({
-        imageKey: key,
-        imageUrl: url,
-        location: newLocation,
-      });
-      await this.locationImageRepository.save(locationImage);
-      locationImages.push(url);
+    if (images) {
+      for (const image of images) {
+        const { key, url } = await this.s3Service.uploadImage(image);
+        const locationImage = await this.locationImageRepository.create({
+          imageKey: key,
+          imageUrl: url,
+          location: newLocation,
+        });
+        await this.locationImageRepository.save(locationImage);
+        locationImages.push(url);
+      }
     }
     await this.locationRepository.save(newLocation);
 
