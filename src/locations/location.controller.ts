@@ -31,7 +31,6 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FilesToBodyInterceptor } from './api-file.decorator';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
-import { type } from 'os';
 
 @Controller('locations')
 @ApiTags('location')

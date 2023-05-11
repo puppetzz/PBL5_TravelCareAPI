@@ -9,6 +9,7 @@ import { AddressModule } from 'src/address/address.module';
 import { S3Module } from 'src/aws-s3/s3.module';
 import { User } from 'src/user/entities/user.entity';
 import { LocationImage } from './entities/location-image.entity';
+import { Hotel } from 'src/hotels/entities/hotel.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -17,6 +18,7 @@ import { LocationImage } from './entities/location-image.entity';
       Category,
       User,
       LocationImage,
+      Hotel,
     ]),
     AddressModule,
     S3Module,

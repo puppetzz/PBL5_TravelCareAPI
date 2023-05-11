@@ -10,6 +10,14 @@ export class CreateLocationDTO {
   description?: string;
   @ApiPropertyOptional()
   isHotel?: boolean;
+  @ApiPropertyOptional()
+  phoneNumber?: string;
+  @ApiPropertyOptional()
+  email?: string;
+  @ApiPropertyOptional()
+  website?: string;
+  @ApiPropertyOptional()
+  hotelClass?: number;
   @ApiProperty()
   countryId?: string;
   @ApiProperty()
