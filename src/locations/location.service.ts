@@ -11,7 +11,7 @@ import { Category } from './entities/category.entity';
 import { AddressService } from 'src/address/address.service';
 import { LocationImage } from './entities/location-image.entity';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
-import { Console } from 'console';
+import { Hotel } from 'src/hotels/entities/hotel.entity';
 @Injectable()
 export class LocationService {
   constructor(
@@ -25,6 +25,8 @@ export class LocationService {
     private userRepository: Repository<User>,
     @InjectRepository(LocationImage)
     private locationImageRepository: Repository<LocationImage>,
+    @InjectRepository(Hotel)
+    private hotelRepository: Repository<Hotel>,
     private readonly s3Service: S3Service,
     private readonly addressService: AddressService,
   ) {}
@@ -72,6 +74,10 @@ export class LocationService {
       about,
       description,
       isHotel,
+      phoneNumber,
+      email,
+      website,
+      hotelClass,
       categories,
       countryId,
       provinceId,
@@ -104,7 +110,6 @@ export class LocationService {
       categories: categoryEntities,
     });
     await this.locationRepository.save(newLocation);
-    const locationImages = [];
     if (images) {
       for (const image of images) {
         const { key, url } = await this.s3Service.uploadImage(image);
@@ -114,14 +119,37 @@ export class LocationService {
           location: newLocation,
         });
         await this.locationImageRepository.save(locationImage);
-        locationImages.push(url);
       }
     }
-    await this.locationRepository.save(newLocation);
 
-    newLocation.locationImages = locationImages;
+    if (isHotel === true) {
+      const newHotel = await this.hotelRepository.create({
+        phoneNumber,
+        email,
+        website,
+        hotelClass,
+        location: newLocation,
+      });
+      await this.hotelRepository.save(newHotel);
+    }
 
-    return newLocation;
+    const resultLocation = await this.locationRepository.findOne({
+      where: {
+        id: newLocation.id,
+      },
+      relations: {
+        address: {
+          country: true,
+          province: true,
+          district: true,
+          ward: true,
+        },
+        categories: true,
+        locationImages: true,
+        hotel: true,
+      },
+    });
+    return resultLocation;
   }
   async updateLocation(
     updateLocationDto: UpdateLocationDto,
