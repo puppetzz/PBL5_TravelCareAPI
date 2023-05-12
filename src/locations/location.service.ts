@@ -39,13 +39,14 @@ export class LocationService {
       .leftJoinAndSelect('location.locationImages', 'locationImage')
       .leftJoinAndSelect('review.reviewImages', 'review-image')
       .leftJoinAndSelect('location.categories', 'category')
+      .leftJoinAndSelect('location.hotel', 'hotel')
       .innerJoinAndSelect('location.address', 'address')
       .innerJoinAndSelect('address.country', 'country')
       .innerJoinAndSelect('address.province', 'province')
       .innerJoinAndSelect('address.district', 'district')
       .innerJoinAndSelect('address.ward', 'ward')
-      .addOrderBy('location.rating', 'DESC');
-
+      .addOrderBy('location.rating', 'DESC')
+      .addOrderBy('location.reviewCount', 'DESC');
     if (search) {
       const searchLower = search.toLowerCase();
       locations.where(
