@@ -46,6 +46,8 @@ export class LocationService {
       .leftJoinAndSelect('review.reviewImages', 'review-image')
       .leftJoinAndSelect('location.categories', 'category')
       .leftJoinAndSelect('location.hotel', 'hotel')
+      .leftJoinAndSelect('hotel.hotelStyles', 'hotelStyles')
+      .leftJoinAndSelect('hotel.propertyAmenities', 'propertyAmenities')
       .innerJoinAndSelect('location.address', 'address')
       .innerJoinAndSelect('address.country', 'country')
       .innerJoinAndSelect('address.province', 'province')
