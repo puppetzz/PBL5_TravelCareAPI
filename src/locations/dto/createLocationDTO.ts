@@ -18,6 +18,10 @@ export class CreateLocationDTO {
   website?: string;
   @ApiPropertyOptional()
   hotelClass?: number;
+  @ApiPropertyOptional()
+  property_amenities?: string;
+  @ApiPropertyOptional()
+  hotel_styleId?: string;
   @ApiProperty()
   countryId?: string;
   @ApiProperty()
