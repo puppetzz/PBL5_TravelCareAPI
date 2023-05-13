@@ -12,6 +12,8 @@ import { AddressService } from 'src/address/address.service';
 import { LocationImage } from './entities/location-image.entity';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
+import { PropertyAmenity } from 'src/hotels/entities/property-amenity.entity';
+import { HotelStyle } from 'src/hotels/entities/hotel-style.entity';
 @Injectable()
 export class LocationService {
   constructor(
@@ -27,6 +29,10 @@ export class LocationService {
     private locationImageRepository: Repository<LocationImage>,
     @InjectRepository(Hotel)
     private hotelRepository: Repository<Hotel>,
+    @InjectRepository(PropertyAmenity)
+    private propertyAmenityRepository: Repository<PropertyAmenity>,
+    @InjectRepository(HotelStyle)
+    private hotelStyleRepository: Repository<HotelStyle>,
     private readonly s3Service: S3Service,
     private readonly addressService: AddressService,
   ) {}
@@ -78,6 +84,8 @@ export class LocationService {
       phoneNumber,
       email,
       website,
+      hotel_styleId,
+      property_amenities,
       hotelClass,
       categories,
       countryId,
@@ -124,12 +132,21 @@ export class LocationService {
     }
 
     if (isHotel === true) {
+      const hotelStyle = await this.hotelStyleRepository.findBy({
+        id: hotel_styleId,
+      });
+      const propertyArray = property_amenities.split(',');
+      const properties = await this.propertyAmenityRepository.findBy({
+        id: In(propertyArray),
+      });
       const newHotel = await this.hotelRepository.create({
         phoneNumber,
         email,
         website,
         hotelClass,
         location: newLocation,
+        propertyAmenities: properties,
+        hotelStyles: hotelStyle,
       });
       await this.hotelRepository.save(newHotel);
     }
@@ -147,7 +164,10 @@ export class LocationService {
         },
         categories: true,
         locationImages: true,
-        hotel: true,
+        hotel: {
+          hotelStyles: true,
+          propertyAmenities: true,
+        },
       },
     });
     return resultLocation;
@@ -176,7 +196,6 @@ export class LocationService {
       currentImages,
       images,
     } = updateLocationDto;
-    console.log(isHotel, typeof isHotel);
 
     if (!updateLocation) {
       throw new NotFoundException(`Location ${locationId} not found`);
