@@ -70,4 +70,10 @@ export class LocationController {
   ) {
     return this.locationService.updateLocation(updateLocationDto, locationId);
   }
+
+  @Get('/:locationId')
+  @UsePipes(ValidationPipe)
+  getLocationById(@Param('locationId') locationId: string) {
+    return this.locationService.getLocationById(locationId);
+  }
 }
