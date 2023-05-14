@@ -38,7 +38,7 @@ export class LocationService {
   ) {}
 
   async getLocations(filterDTO: FilterDto): Promise<Location[]> {
-    const { id, search, page, limit } = filterDTO;
+    const { search, page, limit } = filterDTO;
     const locations = await this.locationRepository
       .createQueryBuilder('location')
       .leftJoinAndSelect('location.reviews', 'review')
@@ -48,11 +48,11 @@ export class LocationService {
       .leftJoinAndSelect('location.hotel', 'hotel')
       .leftJoinAndSelect('hotel.hotelStyles', 'hotelStyles')
       .leftJoinAndSelect('hotel.propertyAmenities', 'propertyAmenities')
-      .innerJoinAndSelect('location.address', 'address')
-      .innerJoinAndSelect('address.country', 'country')
-      .innerJoinAndSelect('address.province', 'province')
-      .innerJoinAndSelect('address.district', 'district')
-      .innerJoinAndSelect('address.ward', 'ward')
+      .leftJoinAndSelect('location.address', 'address')
+      .leftJoinAndSelect('address.country', 'country')
+      .leftJoinAndSelect('address.province', 'province')
+      .leftJoinAndSelect('address.district', 'district')
+      .leftJoinAndSelect('address.ward', 'ward')
       .addOrderBy('location.rating', 'DESC')
       .addOrderBy('location.reviewCount', 'DESC');
     if (search) {
@@ -62,10 +62,6 @@ export class LocationService {
         { address: `%${searchLower}%`, name: `%${searchLower}%` },
       );
     }
-    if (id) {
-      return await locations.where('location.id = :id', { id: id }).getMany();
-    }
-
     if (page && limit) {
       locations.limit(limit).offset((page - 1) * limit);
     }
@@ -184,6 +180,8 @@ export class LocationService {
       },
       relations: ['address', 'locationImages', 'categories'],
     });
+    console.log(updateLocation);
+
     const {
       name,
       about,
@@ -206,7 +204,7 @@ export class LocationService {
       const categoriesArray = categories.split(',');
       if (categoriesArray.length) {
         const categories = await this.categoryRepository.findBy({
-          id: In(categoriesArray.map((string) => parseInt(string))),
+          id: In(categoriesArray),
         });
         if (categories) {
           updateLocation.categories = categories;
@@ -269,17 +267,33 @@ export class LocationService {
         await this.locationImageRepository.save(locationImage);
       }
     }
-    const newLocation = await this.locationRepository
-      .createQueryBuilder('location')
-      .leftJoinAndSelect('location.categories', 'category')
-      .leftJoinAndSelect('location.locationImages', 'locationImage')
-      .innerJoinAndSelect('location.address', 'address')
-      .innerJoinAndSelect('address.country', 'country')
-      .innerJoinAndSelect('address.province', 'province')
-      .innerJoinAndSelect('address.district', 'district')
-      .innerJoinAndSelect('address.ward', 'ward')
-      .getOne();
-
-    return newLocation;
+    const result = await this.locationRepository.findOne({
+      where: {
+        id: locationId,
+      },
+      relations: ['address', 'locationImages', 'categories', 'hotel'],
+    });
+    return result;
+  }
+  async getLocationById(id: string): Promise<Location> {
+    return await this.locationRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        address: {
+          country: true,
+          province: true,
+          district: true,
+          ward: true,
+        },
+        categories: true,
+        locationImages: true,
+        hotel: {
+          hotelStyles: true,
+          propertyAmenities: true,
+        },
+      },
+    });
   }
 }

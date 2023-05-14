@@ -1,9 +1,6 @@
-import { IsIn, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class FilterDto {
-  @IsOptional()
-  id: string;
-
   @IsOptional()
   search: string;
 
