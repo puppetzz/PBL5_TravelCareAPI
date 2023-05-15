@@ -82,8 +82,8 @@ export class LocationService {
       phoneNumber,
       email,
       website,
-      hotel_styleId,
-      property_amenities,
+      hotelStyleId,
+      propertyAmenities,
       hotelClass,
       categories,
       countryId,
@@ -131,9 +131,9 @@ export class LocationService {
 
     if (isHotel === true) {
       const hotelStyle = await this.hotelStyleRepository.findBy({
-        id: hotel_styleId,
+        id: hotelStyleId,
       });
-      const propertyArray = property_amenities.split(',');
+      const propertyArray = propertyAmenities.split(',');
       const properties = await this.propertyAmenityRepository.findBy({
         id: In(propertyArray),
       });
