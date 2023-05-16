@@ -8,12 +8,15 @@ import { AuthModule } from './auth/auth.module';
 import { LocationModule } from './locations/location.module';
 import { CategoryModule } from './locations/category.module';
 import { HotelModule } from './hotels/hotels.module';
-import { RoomModule } from './rooms/roms.module';
+import { RoomModule } from './rooms/rooms.module';
 import { BookingModule } from './booking/booking.module';
 import { ReviewModule } from './reviews/review.module';
 import { WishlistModule } from './wishlists/wishList.module';
 import { HotelStyleModule } from './hotels/hotel-style.module';
 import { PropertyAmenityModule } from './hotels/property-amenity.module';
+import { RoomTypeModule } from './rooms/room-type.module';
+import { RoomFeatureModule } from './rooms/room-feature.module';
+import { DiscountModule } from './rooms/discount.module';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { PropertyAmenityModule } from './hotels/property-amenity.module';
     CategoryModule,
     HotelModule,
     RoomModule,
+    RoomTypeModule,
+    RoomFeatureModule,
+    DiscountModule,
     BookingModule,
     ReviewModule,
     WishlistModule,

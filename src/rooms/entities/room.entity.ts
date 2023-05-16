@@ -12,6 +12,7 @@ import { RoomFeature } from './room-feature.entity';
 import { RoomType } from './room-type.entity';
 import { Booking } from 'src/booking/entities/booking.entity';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
+import { RoomImage } from './room-image.entity';
 
 @Entity()
 export class Room {
@@ -32,6 +33,9 @@ export class Room {
 
   @Column({ nullable: false, default: false })
   isPrepay: boolean;
+
+  @OneToMany(() => RoomImage, (roomImage) => roomImage.room)
+  roomImages: RoomImage[];
 
   @ManyToOne(() => Hotel, (hotel) => hotel.rooms)
   hotel: Hotel;
