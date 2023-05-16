@@ -1,4 +1,4 @@
-import { Room } from 'src/rooms/entities/rom.entity';
+import { Room } from 'src/rooms/entities/room.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,

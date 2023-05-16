@@ -14,7 +14,7 @@ import { HotelImage } from './hotel-image.entity';
 import { PropertyAmenity } from './property-amenity.entity';
 import { HotelStyle } from './hotel-style.entity';
 import { Language } from './language.entity';
-import { Room } from 'src/rooms/entities/rom.entity';
+import { Room } from 'src/rooms/entities/room.entity';
 
 @Entity()
 export class Hotel {

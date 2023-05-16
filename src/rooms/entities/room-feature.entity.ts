@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Room } from './rom.entity';
+import { Room } from './room.entity';
 
 @Entity()
 export class RoomFeature {
