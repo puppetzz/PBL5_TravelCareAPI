@@ -10,7 +10,6 @@ import {
 import { Discount } from './discount.entity';
 import { RoomFeature } from './room-feature.entity';
 import { RoomType } from './room-type.entity';
-import { RoomBed } from './room-bed.entity';
 import { Booking } from 'src/booking/entities/booking.entity';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
 
@@ -58,14 +57,6 @@ export class Room {
   })
   @JoinTable()
   roomTypes: RoomType[];
-
-  @OneToMany(() => RoomBed, (roomBed) => roomBed.room, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-    cascade: true,
-    nullable: false,
-  })
-  roomBeds: RoomBed[];
 
   @ManyToMany(() => Booking, (booking) => booking.rooms)
   booking: Booking[];
