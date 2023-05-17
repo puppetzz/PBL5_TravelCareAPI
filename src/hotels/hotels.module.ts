@@ -7,6 +7,8 @@ import { PropertyAmenity } from './entities/property-amenity.entity';
 import { Language } from './entities/language.entity';
 import { HotelController } from './hotel.controller';
 import { HotelService } from './hotel.service';
+import { RoomModule } from 'src/rooms/room.module';
+import { Room } from 'src/rooms/entities/room.entity';
 
 @Module({
   imports: [
@@ -16,7 +18,9 @@ import { HotelService } from './hotel.service';
       HotelStyle,
       PropertyAmenity,
       Language,
+      Room,
     ]),
+    RoomModule,
   ],
   controllers: [HotelController],
   providers: [HotelService],
