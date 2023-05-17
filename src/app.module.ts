@@ -8,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { LocationModule } from './locations/location.module';
 import { CategoryModule } from './locations/category.module';
 import { HotelModule } from './hotels/hotels.module';
-import { RoomModule } from './rooms/rooms.module';
+import { RoomModule } from './rooms/room.module';
 import { BookingModule } from './booking/booking.module';
 import { ReviewModule } from './reviews/review.module';
 import { WishlistModule } from './wishlists/wishList.module';
