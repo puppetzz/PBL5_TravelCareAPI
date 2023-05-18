@@ -3,10 +3,8 @@ import { Location } from 'src/locations/entities/location.entity';
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
@@ -60,9 +58,8 @@ export class Review {
   })
   reviewImages: ReviewImage[];
 
-  @OneToOne(() => TripType, (tripType) => tripType.review, {
+  @ManyToOne(() => TripType, (tripType) => tripType.reviews, {
     onUpdate: 'CASCADE',
   })
-  @JoinColumn()
   tripType: TripType;
 }

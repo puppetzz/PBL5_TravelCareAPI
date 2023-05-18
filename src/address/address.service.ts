@@ -89,9 +89,7 @@ export class AddressService {
       });
 
       if (!ward)
-        throw new BadRequestException(
-          `Province with id ${wardId} is not exist`,
-        );
+        throw new BadRequestException(`Ward with id ${wardId} is not exist`);
 
       newAddress.ward = ward;
     }

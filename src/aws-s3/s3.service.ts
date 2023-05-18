@@ -12,7 +12,6 @@ export class S3Service {
       throw new BadRequestException('This file must be an image');
 
     const s3 = new S3();
-    console.log(image.filename);
 
     const uploadResult = await s3
       .upload({
