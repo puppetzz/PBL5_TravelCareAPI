@@ -78,7 +78,6 @@ export class LocationService {
       name,
       about,
       description,
-      isHotel,
       phoneNumber,
       email,
       website,
@@ -93,7 +92,7 @@ export class LocationService {
       streetAddress,
       images,
     } = createLocationDto;
-
+    const isHotel = JSON.parse(createLocationDto.isHotel);
     const newAddress = await this.addressService.createAddress(
       countryId,
       provinceId,
@@ -130,22 +129,27 @@ export class LocationService {
     }
 
     if (isHotel === true) {
-      const hotelStyle = await this.hotelStyleRepository.findBy({
-        id: hotelStyleId,
-      });
-      const propertyArray = propertyAmenities.split(',');
-      const properties = await this.propertyAmenityRepository.findBy({
-        id: In(propertyArray),
-      });
       const newHotel = await this.hotelRepository.create({
         phoneNumber,
         email,
         website,
         hotelClass,
         location: newLocation,
-        propertyAmenities: properties,
-        hotelStyles: hotelStyle,
       });
+
+      if (hotelStyleId) {
+        const hotelStyle = await this.hotelStyleRepository.findBy({
+          id: hotelStyleId,
+        });
+        newHotel.hotelStyles = hotelStyle;
+      }
+      if (propertyAmenities) {
+        const propertyArray = propertyAmenities.split(',');
+        const properties = await this.propertyAmenityRepository.findBy({
+          id: In(propertyArray),
+        });
+        newHotel.propertyAmenities = properties;
+      }
       await this.hotelRepository.save(newHotel);
     }
 
