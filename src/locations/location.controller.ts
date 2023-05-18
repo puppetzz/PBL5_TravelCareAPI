@@ -60,6 +60,7 @@ export class LocationController {
     @Body() createLocationDTO: CreateLocationDTO,
     @GetCurrentAccount() user: User,
   ): Promise<Location> {
+
     return this.locationService.createLocation(createLocationDTO, user);
   }
   @Patch('/:locationId')

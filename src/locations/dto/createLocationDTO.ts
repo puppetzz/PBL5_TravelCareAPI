@@ -8,8 +8,8 @@ export class CreateLocationDTO {
   about?: string;
   @ApiPropertyOptional()
   description?: string;
-  @ApiPropertyOptional()
-  isHotel?: boolean;
+  @ApiProperty()
+  isHotel: string;
   @ApiPropertyOptional()
   phoneNumber?: string;
   @ApiPropertyOptional()
