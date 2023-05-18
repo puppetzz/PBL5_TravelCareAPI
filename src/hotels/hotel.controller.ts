@@ -1,6 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   UnauthorizedException,
@@ -12,7 +15,7 @@ import { HotelService } from './hotel.service';
 import { RoomService } from 'src/rooms/room.service';
 import { Room } from 'src/rooms/entities/room.entity';
 import { CreateRoomDto } from 'src/rooms/dto/createRoom.dto';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decorator';
 import { User } from 'src/user/entities/user.entity';
@@ -36,5 +39,12 @@ export class HotelController {
       throw new UnauthorizedException('User is not owner of this hotel');
     }
     return this.roomService.createRoom(hotelId, createRoomDto);
+  }
+
+  @Get('/:hotelId/rooms')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'get rooms of hotel' })
+  async getRoomsOfHotel(@Param('hotelId') hotelId: string): Promise<Room[]> {
+    return this.roomService.getRoomsByHotelId(hotelId);
   }
 }
