@@ -37,7 +37,9 @@ export class Room {
   @OneToMany(() => RoomImage, (roomImage) => roomImage.room)
   roomImages: RoomImage[];
 
-  @ManyToOne(() => Hotel, (hotel) => hotel.rooms)
+  @ManyToOne(() => Hotel, (hotel) => hotel.rooms, {
+    onDelete: 'CASCADE',
+  })
   hotel: Hotel;
 
   @ManyToMany(() => Discount, (discount) => discount.rooms, {
