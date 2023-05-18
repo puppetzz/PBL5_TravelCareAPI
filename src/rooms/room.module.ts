@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Room } from './entities/room.entity';
 import { Discount } from './entities/discount.entity';
@@ -10,6 +10,7 @@ import { DiscountModule } from './discount.module';
 import { RoomFeatureModule } from './room-feature.module';
 import { RoomTypeModule } from './room-type.module';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
+import { HotelModule } from 'src/hotels/hotels.module';
 
 @Module({
   imports: [
@@ -17,12 +18,13 @@ import { Hotel } from 'src/hotels/entities/hotel.entity';
     DiscountModule,
     RoomFeatureModule,
     RoomTypeModule,
+    forwardRef(() => HotelModule),
   ],
+  controllers: [RoomController],
+  providers: [RoomService],
   exports: [
     TypeOrmModule.forFeature([Room, Discount, RoomFeature, RoomType, Hotel]),
     RoomService,
   ],
-  controllers: [RoomController],
-  providers: [RoomService],
 })
 export class RoomModule {}

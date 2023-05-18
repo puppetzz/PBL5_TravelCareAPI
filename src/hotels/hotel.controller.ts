@@ -4,12 +4,14 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Post,
   UnauthorizedException,
   UseGuards,
   UsePipes,
   ValidationPipe,
+  forwardRef,
 } from '@nestjs/common';
 import { HotelService } from './hotel.service';
 import { RoomService } from 'src/rooms/room.service';
