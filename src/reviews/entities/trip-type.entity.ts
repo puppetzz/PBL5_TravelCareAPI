@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { OneToMany } from 'typeorm/decorator/relations/OneToMany';
 import { Review } from './review.entity';
 
 @Entity()
@@ -12,6 +13,6 @@ export class TripType {
   @ApiProperty()
   name: string;
 
-  @OneToOne(() => Review, (review) => review.tripType)
-  review: Review;
+  @OneToMany(() => Review, (review) => review.tripType)
+  reviews: Review[];
 }
