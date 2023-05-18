@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  forwardRef,
+} from '@nestjs/common';
 import { Room } from './entities/room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateRoomDto } from './dto/createRoom.dto';
@@ -7,6 +13,8 @@ import { In, Repository } from 'typeorm';
 import { Discount } from './entities/discount.entity';
 import { RoomFeature } from './entities/room-feature.entity';
 import { RoomType } from './entities/room-type.entity';
+import { HotelService } from 'src/hotels/hotel.service';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class RoomService {
@@ -21,6 +29,7 @@ export class RoomService {
     private roomFeatureRepository: Repository<RoomFeature>,
     @InjectRepository(RoomType)
     private roomTypeRepository: Repository<RoomType>,
+    private readonly hotelService: HotelService,
   ) {}
   async createRoom(
     hotelId: string,
@@ -78,5 +87,26 @@ export class RoomService {
       relations: ['discounts', 'roomTypes', 'roomFeatures', 'roomImages'],
     });
     return rooms;
+  }
+  async getRoomById(roomId: string): Promise<Room> {
+    return this.roomRepository.findOne({
+      where: {
+        id: roomId,
+      },
+      relations: ['discounts', 'roomTypes', 'roomFeatures', 'roomImages'],
+    });
+  }
+  async deleteRoomById(roomId: string, user: User): Promise<void> {
+    const hotel = await this.hotelRepository.findOne({
+      where: {
+        rooms: {
+          id: roomId,
+        },
+      },
+    });
+    if (!(await this.hotelService.checkIfOwner(hotel.id, user))) {
+      throw new UnauthorizedException('User is not owner of this hotel');
+    }
+    await this.roomRepository.delete(roomId);
   }
 }
