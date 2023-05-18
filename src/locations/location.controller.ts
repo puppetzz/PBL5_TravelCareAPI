@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -9,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  UnauthorizedException,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -75,5 +77,20 @@ export class LocationController {
   @UsePipes(ValidationPipe)
   getLocationById(@Param('locationId') locationId: string) {
     return this.locationService.getLocationById(locationId);
+  }
+  @Delete('/:locationId')
+  @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete a location' })
+  @UsePipes(ValidationPipe)
+  async deleteLocationById(
+    @Param('locationId') id: string,
+    @GetCurrentAccount() user: User,
+  ): Promise<void> {
+    if (!(await this.locationService.checkRoleAdmin(user))) {
+      throw new UnauthorizedException('User not Administrator');
+    }
+    return this.locationService.deleteLocation(id);
   }
 }
