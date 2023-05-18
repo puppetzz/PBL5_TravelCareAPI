@@ -68,4 +68,15 @@ export class RoomService {
     }
     return await this.roomRepository.save(createRoom);
   }
+  async getRoomsByHotelId(hotelId: string): Promise<Room[]> {
+    const rooms = await this.roomRepository.find({
+      where: {
+        hotel: {
+          id: hotelId,
+        },
+      },
+      relations: ['discounts', 'roomTypes', 'roomFeatures', 'roomImages'],
+    });
+    return rooms;
+  }
 }

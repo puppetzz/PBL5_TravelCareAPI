@@ -296,4 +296,13 @@ export class LocationService {
       },
     });
   }
+  async deleteLocation(id: string): Promise<void> {
+    await this.locationRepository.delete(id);
+  }
+  async checkRoleAdmin(user: User): Promise<boolean> {
+    if (user.role.toString().toLowerCase().includes('admin')) {
+      return true;
+    }
+    return false;
+  }
 }
