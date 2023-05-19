@@ -141,6 +141,7 @@ export class LocationService {
         const hotelArray = hotelStyleIds.split(',');
         const hotelStyle = await this.hotelStyleRepository.findBy({
           id: In(hotelArray),
+
         });
         newHotel.hotelStyles = hotelStyle;
       }
