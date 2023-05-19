@@ -81,7 +81,7 @@ export class LocationService {
       phoneNumber,
       email,
       website,
-      hotelStyleId,
+      hotelStyleIds,
       propertyAmenities,
       hotelClass,
       categories,
@@ -137,9 +137,10 @@ export class LocationService {
         location: newLocation,
       });
 
-      if (hotelStyleId) {
+      if (hotelStyleIds) {
+        const hotelArray = hotelStyleIds.split(',');
         const hotelStyle = await this.hotelStyleRepository.findBy({
-          id: hotelStyleId,
+          id: In(hotelArray),
         });
         newHotel.hotelStyles = hotelStyle;
       }

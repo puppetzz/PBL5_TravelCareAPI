@@ -21,7 +21,7 @@ export class CreateLocationDTO {
   @ApiPropertyOptional()
   propertyAmenities?: string;
   @ApiPropertyOptional()
-  hotelStyleId?: string;
+  hotelStyleIds?: string;
   @ApiProperty()
   countryId?: string;
   @ApiProperty()
