@@ -1,6 +1,7 @@
 import {
   Controller,
   Delete,
+  Patch,
   UploadedFile,
   UploadedFiles,
 } from '@nestjs/common';
@@ -32,6 +33,7 @@ import { User } from 'src/user/entities/user.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiMultiFile } from 'src/ultils/imagesSwagger';
 import { FilesToBodyInterceptor } from 'src/locations/api-file.decorator';
+import { RoomDto } from './dto/room.dto';
 
 @Controller('rooms')
 @ApiTags('Room')
@@ -57,7 +59,22 @@ export class RoomController {
     return this.roomService.deleteRoomById(roomId, user);
   }
 
+  @Patch('/:roomId')
+  @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'update room by roomId' })
+  async updateRoom(
+    @Param('roomId') roomId: string,
+    @GetCurrentAccount() user: User,
+    @Body() updateRoomDto: RoomDto,
+  ): Promise<Room> {
+    return this.roomService.updateRoom(roomId, updateRoomDto, user);
+  }
+
   @Post('/:roomId/uploadImages')
+  @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload images for room' })
   @ApiMultiFile('images')
@@ -65,7 +82,8 @@ export class RoomController {
   uploadMultipleFiles(
     @UploadedFiles() files: any,
     @Param('roomId') roomId: string,
+    @GetCurrentAccount() user: User,
   ) {
-    return this.roomService.uploadImages(roomId, files);
+    return this.roomService.uploadImages(roomId, files, user);
   }
 }

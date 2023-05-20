@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class CreateRoomDto {
+export class RoomDto {
   @ApiProperty()
   price?: number;
   @ApiProperty()
