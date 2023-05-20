@@ -15,6 +15,8 @@ import { RoomFeature } from './entities/room-feature.entity';
 import { RoomType } from './entities/room-type.entity';
 import { HotelService } from 'src/hotels/hotel.service';
 import { User } from 'src/user/entities/user.entity';
+import { RoomImage } from './entities/room-image.entity';
+import { S3Service } from 'src/aws-s3/s3.service';
 
 @Injectable()
 export class RoomService {
@@ -29,7 +31,10 @@ export class RoomService {
     private roomFeatureRepository: Repository<RoomFeature>,
     @InjectRepository(RoomType)
     private roomTypeRepository: Repository<RoomType>,
+    @InjectRepository(RoomImage)
+    private roomImageRepository: Repository<RoomImage>,
     private readonly hotelService: HotelService,
+    private readonly s3Service: S3Service,
   ) {}
   async createRoom(
     hotelId: string,
@@ -108,5 +113,30 @@ export class RoomService {
       throw new UnauthorizedException('User is not owner of this hotel');
     }
     await this.roomRepository.delete(roomId);
+  }
+  async uploadImages(
+    roomId: string,
+    files: Express.Multer.File[],
+  ): Promise<RoomImage[]> {
+    const resImages = [];
+    if (files) {
+      const room = await this.roomRepository.findOneBy({
+        id: roomId,
+      });
+      if (!room) {
+        throw new NotFoundException(`Room ${room.id} not found`);
+      }
+      for (const image of files) {
+        const { key, url } = await this.s3Service.uploadImage(image);
+        const roomImage = await this.roomImageRepository.create({
+          imageKey: key,
+          imageUrl: url,
+          room: room,
+        });
+        await this.roomImageRepository.save(roomImage);
+        resImages.push(roomImage);
+      }
+    }
+    return resImages;
   }
 }
