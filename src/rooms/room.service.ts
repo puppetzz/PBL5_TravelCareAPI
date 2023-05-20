@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Room } from './entities/room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateRoomDto } from './dto/createRoom.dto';
+import { RoomDto } from './dto/room.dto';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { In, Repository } from 'typeorm';
 import { Discount } from './entities/discount.entity';
@@ -36,10 +36,7 @@ export class RoomService {
     private readonly hotelService: HotelService,
     private readonly s3Service: S3Service,
   ) {}
-  async createRoom(
-    hotelId: string,
-    createRoomDto: CreateRoomDto,
-  ): Promise<Room> {
+  async createRoom(hotelId: string, createRoomDto: RoomDto): Promise<Room> {
     const hotelOwner = await this.hotelRepository.findOneBy({ id: hotelId });
     if (!hotelOwner) {
       throw new NotFoundException(`Hotel ${hotelId} not found`);
@@ -82,6 +79,63 @@ export class RoomService {
     }
     return await this.roomRepository.save(createRoom);
   }
+  async updateRoom(
+    roomId: string,
+    updateRoomDto: RoomDto,
+    user: User,
+  ): Promise<Room> {
+    const hotel = await this.hotelRepository.findOne({
+      where: {
+        rooms: {
+          id: roomId,
+        },
+      },
+    });
+    if (!(await this.hotelService.checkIfOwner(hotel.id, user))) {
+      throw new UnauthorizedException('User is not owner of this hotel');
+    }
+    const room = await this.roomRepository.findOneBy({
+      id: roomId,
+    });
+    if (!room) {
+      throw new NotFoundException(`Room ${room.id} not found`);
+    }
+    const {
+      price,
+      numberOfRooms,
+      avaliableRooms,
+      sleeps,
+      isPrepay,
+      discountIds,
+      roomFeatureIds,
+      roomTypeIds,
+    } = updateRoomDto;
+    room.price = price;
+    room.numberOfRooms = numberOfRooms;
+    room.avaliableRooms = avaliableRooms;
+    room.sleeps = sleeps;
+    room.isPrepay = isPrepay;
+    if (discountIds) {
+      const discountEntities = await this.discountRepository.findBy({
+        id: In(discountIds),
+      });
+      room.discounts = discountEntities;
+    }
+    if (roomFeatureIds) {
+      const roomFeatures = await this.roomFeatureRepository.findBy({
+        id: In(roomFeatureIds),
+      });
+      room.roomFeatures = roomFeatures;
+    }
+    if (roomTypeIds) {
+      const roomTypes = await this.roomTypeRepository.findBy({
+        id: In(roomTypeIds),
+      });
+      room.roomTypes = roomTypes;
+    }
+    await this.roomRepository.save(room);
+    return this.getRoomById(roomId);
+  }
   async getRoomsByHotelId(hotelId: string): Promise<Room[]> {
     const rooms = await this.roomRepository.find({
       where: {
@@ -117,7 +171,19 @@ export class RoomService {
   async uploadImages(
     roomId: string,
     files: Express.Multer.File[],
+    user: User,
   ): Promise<RoomImage[]> {
+    const hotel = await this.hotelRepository.findOne({
+      where: {
+        rooms: {
+          id: roomId,
+        },
+      },
+    });
+    if (!(await this.hotelService.checkIfOwner(hotel.id, user))) {
+      throw new UnauthorizedException('User is not owner of this hotel');
+    }
+
     const resImages = [];
     if (files) {
       const room = await this.roomRepository.findOneBy({

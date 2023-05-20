@@ -16,7 +16,7 @@ import {
 import { HotelService } from './hotel.service';
 import { RoomService } from 'src/rooms/room.service';
 import { Room } from 'src/rooms/entities/room.entity';
-import { CreateRoomDto } from 'src/rooms/dto/createRoom.dto';
+import { RoomDto } from 'src/rooms/dto/room.dto';
 import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decorator';
@@ -34,7 +34,7 @@ export class HotelController {
   @ApiSecurity('JWT-auth')
   async createRoomForHotel(
     @Param('hotelId') hotelId: string,
-    @Body() createRoomDto: CreateRoomDto,
+    @Body() createRoomDto: RoomDto,
     @GetCurrentAccount() user: User,
   ): Promise<Room> {
     if (!(await this.hotelService.checkIfOwner(hotelId, user))) {
