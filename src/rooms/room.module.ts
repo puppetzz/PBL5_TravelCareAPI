@@ -11,13 +11,23 @@ import { RoomFeatureModule } from './room-feature.module';
 import { RoomTypeModule } from './room-type.module';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { HotelModule } from 'src/hotels/hotels.module';
+import { RoomImage } from './entities/room-image.entity';
+import { S3Module } from 'src/aws-s3/s3.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Room, Discount, RoomFeature, RoomType, Hotel]),
+    TypeOrmModule.forFeature([
+      Room,
+      Discount,
+      RoomFeature,
+      RoomType,
+      Hotel,
+      RoomImage,
+    ]),
     DiscountModule,
     RoomFeatureModule,
     RoomTypeModule,
+    S3Module,
     forwardRef(() => HotelModule),
   ],
   controllers: [RoomController],
