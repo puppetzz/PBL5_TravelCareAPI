@@ -9,13 +9,11 @@ import { IsNull, Not, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
-import { Address } from '../address/entities/address.entity';
 import { AddressService } from '../address/address.service';
 import { LoginDto } from './dto/login.dto';
 import { Tokens } from './types/tokens.type';
 import { config } from 'dotenv';
 import { LoginResponse } from './types/login-response.type';
-import { S3Service } from '../aws-s3/s3.service';
 import { v4 as uuid } from 'uuid';
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
@@ -28,10 +26,8 @@ export class AuthService {
   constructor(
     @InjectRepository(Account) private accountRepository: Repository<Account>,
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Address) private addressRepository: Repository<Address>,
     private jwtService: JwtService,
     private readonly addressService: AddressService,
-    private readonly s3Service: S3Service,
   ) {}
 
   private readonly _ivlen = 16;
@@ -57,7 +53,7 @@ export class AuthService {
     )
       throw new BadRequestException('Email already registered!');
 
-    const newAccount = await this.accountRepository.create({
+    const newAccount = this.accountRepository.create({
       id: id,
       username: registerDto.username,
       passwordHash: encryptData,
@@ -65,11 +61,11 @@ export class AuthService {
       iv: iv,
     });
 
-    const newUser = await this.userRepository.create({
+    const newUser = this.userRepository.create({
       account: newAccount,
       email: registerDto.email,
-      firstName: registerDto.firstName ? registerDto.firstName : null,
-      lastName: registerDto.lastName ? registerDto.lastName : null,
+      firstName: registerDto.firstName,
+      lastName: registerDto.lastName,
       phoneNumber: registerDto.phoneNumber ? registerDto.phoneNumber : null,
     });
 
@@ -100,10 +96,47 @@ export class AuthService {
       },
     });
 
-    if (!account)
-      throw new UnauthorizedException(
-        'Username does not exist or wrong password!',
-      );
+    if (!account) {
+      const user = await this.userRepository.findOne({
+        where: {
+          email: loginDto.username,
+        },
+        relations: {
+          account: true,
+        },
+      });
+
+
+      const salt = Buffer.from(user.account.passwordSalt, 'hex');
+
+      const iv = Buffer.from(user.account.iv, 'hex');
+
+      const decryptedPassword = await this.decryptData(
+        user.account.passwordHash,
+        loginDto.password,
+        salt,
+        iv,
+      ).catch(() => {
+        throw new UnauthorizedException(
+          'Username does not exist or wrong password!',
+        );
+      });
+
+      if (loginDto.password !== decryptedPassword)
+        throw new UnauthorizedException(
+          'Username does not exist or wrong password!',
+        );
+
+      const tokens = await this.getTokens(user.account.id, user.account.username);
+      await this.updateRefreshTokenHash(user.account.id, tokens.refreshToken, iv);
+
+      return {
+        user: {
+          username: user.account.username,
+        },
+        tokens,
+      };
+    }
 
     const salt = Buffer.from(account.passwordSalt, 'hex');
 

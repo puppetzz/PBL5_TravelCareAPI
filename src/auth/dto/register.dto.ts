@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   MinLength,
 } from 'class-validator';
-import { isUndefined } from 'util';
 
 export class RegisterDto {
   @IsAlphanumeric()
@@ -24,10 +23,12 @@ export class RegisterDto {
   @ApiProperty()
   password: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: true })
+  @IsNotEmpty({ message: 'firstName is required!' })
   firstName: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: true })
+  @IsNotEmpty({ message: 'lastName is required!' })
   lastName: string;
 
   @ApiProperty({ required: false })
