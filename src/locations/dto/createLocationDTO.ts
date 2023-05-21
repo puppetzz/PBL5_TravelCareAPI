@@ -8,8 +8,8 @@ export class CreateLocationDTO {
   about?: string;
   @ApiPropertyOptional()
   description?: string;
-  @ApiPropertyOptional()
-  isHotel?: boolean;
+  @ApiProperty()
+  isHotel: string;
   @ApiPropertyOptional()
   phoneNumber?: string;
   @ApiPropertyOptional()
@@ -21,7 +21,7 @@ export class CreateLocationDTO {
   @ApiPropertyOptional()
   propertyAmenities?: string;
   @ApiPropertyOptional()
-  hotelStyleId?: string;
+  hotelStyleIds?: string;
   @ApiProperty()
   countryId?: string;
   @ApiProperty()
