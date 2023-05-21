@@ -31,11 +31,11 @@ export class User {
   @ApiProperty()
   account: Account;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   @ApiProperty()
   firstName: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
   @ApiProperty()
   lastName: string;
 

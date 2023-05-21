@@ -83,10 +83,6 @@ export class UserService {
       },
     });
 
-    await this.accountRepository.update(user.accountId, {
-      username: updateUserDto.username,
-    });
-
     user.firstName = updateUserDto.firstName;
     user.lastName = updateUserDto.lastName;
     user.phoneNumber = updateUserDto.phoneNumber;
