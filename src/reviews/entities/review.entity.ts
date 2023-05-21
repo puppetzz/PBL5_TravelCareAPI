@@ -21,7 +21,7 @@ export class Review {
   @ApiProperty()
   rating: number;
 
-  @Column({ default: new Date().toISOString() })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
   @ApiProperty()
   reviewAt: Date;
 

@@ -14,7 +14,7 @@ export class Receipt {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false, default: new Date().toISOString() })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
   createAt: Date;
 
   @OneToOne(() => Booking, (booking) => booking.receipt, {

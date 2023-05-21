@@ -29,7 +29,7 @@ export class Account {
   @Exclude()
   isVerified: boolean;
 
-  @Column({ type: 'timestamp', default: new Date().toISOString() })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
   @ApiProperty()
   createAt: Date;
 

@@ -46,7 +46,7 @@ export class Booking {
   @Column({ nullable: false, default: false })
   isPaid: boolean;
 
-  @Column({ nullable: false, default: new Date().toISOString() })
+  @Column({ nullable: false, type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
   createAt: Date;
 
   @Column({ nullable: true })

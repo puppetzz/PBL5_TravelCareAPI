@@ -42,6 +42,7 @@ export class ReviewService {
           },
         },
         reviewImages: true,
+        tripType: true,
       },
       select: {
         id: true,
@@ -88,6 +89,7 @@ export class ReviewService {
           },
         },
         reviewImages: true,
+        tripType: true,
       },
       select: {
         id: true,
@@ -181,6 +183,7 @@ export class ReviewService {
         },
         location: true,
         reviewImages: true,
+        tripType: true,
       },
       select: {
         user: {
@@ -229,6 +232,7 @@ export class ReviewService {
     review.content = updateReviewDto.content;
     review.rating = updateReviewDto.rating;
     review.tripTime = updateReviewDto.tripTime;
+    review.updateAt = new Date();
 
     if (updateReviewDto.images) {
       for (let image of updateReviewDto.images) {
@@ -256,6 +260,7 @@ export class ReviewService {
         },
         location: true,
         reviewImages: true,
+        tripType: true,
       },
       select: {
         user: {
