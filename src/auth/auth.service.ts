@@ -104,6 +104,12 @@ export class AuthService {
         relations: {
           account: true,
         },
+        select: {
+          account: {
+            id: true,
+            username: true,
+          }
+        }
       });
 
 
@@ -131,9 +137,7 @@ export class AuthService {
       await this.updateRefreshTokenHash(user.account.id, tokens.refreshToken, iv);
 
       return {
-        user: {
-          username: user.account.username,
-        },
+        user, 
         tokens,
       };
     }
@@ -161,11 +165,24 @@ export class AuthService {
     const tokens = await this.getTokens(account.id, account.username);
     await this.updateRefreshTokenHash(account.id, tokens.refreshToken, iv);
 
-    return {
-      user: {
-        username: account.username,
+    const user = await this.userRepository.findOne({
+      where: {
+        accountId: account.id ,
       },
-      tokens,
+      relations: {
+        account: true,
+      },
+      select: {
+        account: {
+          id: true,
+          username: true,
+        }
+      }
+    });
+
+    return {
+      user,
+      tokens
     };
   }
 
