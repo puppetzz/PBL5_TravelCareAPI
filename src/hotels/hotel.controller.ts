@@ -21,6 +21,7 @@ import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { Hotel } from './entities/hotel.entity';
 
 @Controller('hotels')
 @ApiTags('Hotel')
@@ -48,5 +49,19 @@ export class HotelController {
   @ApiOperation({ summary: 'get rooms of hotel' })
   async getRoomsOfHotel(@Param('hotelId') hotelId: string): Promise<Room[]> {
     return this.roomService.getRoomsByHotelId(hotelId);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all hotels' })
+  async getAllhotels(): Promise<Hotel[]> {
+    return this.hotelService.getAllHotels();
+  }
+
+  @Get('/:hotelId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get hotel by Id' })
+  async getHotelById(@Param('hotelId') id: string): Promise<Hotel> {
+    return this.hotelService.getHotelById(id);
   }
 }
