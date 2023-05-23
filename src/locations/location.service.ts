@@ -63,7 +63,7 @@ export class LocationService {
       );
     }
     if (page && limit) {
-      locations.limit(limit).offset((page - 1) * limit);
+      locations.take(limit).skip((page - 1) * limit);
     }
     const result = await locations.getMany();
 
