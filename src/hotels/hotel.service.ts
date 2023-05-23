@@ -25,4 +25,46 @@ export class HotelService {
     }
     return false;
   }
+  async getAllHotels(): Promise<Hotel[]> {
+    return this.hotelRepository.find({
+      relations: {
+        location: {
+          locationImages: true,
+          categories: true,
+          address: {
+            country: true,
+            province: true,
+            district: true,
+            ward: true,
+          },
+          hotel: false,
+        },
+        hotelStyles: true,
+        propertyAmenities: true,
+      },
+    });
+  }
+
+  async getHotelById(id: string): Promise<Hotel> {
+    return this.hotelRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        location: {
+          locationImages: true,
+          categories: true,
+          address: {
+            country: true,
+            province: true,
+            district: true,
+            ward: true,
+          },
+          hotel: false,
+        },
+        hotelStyles: true,
+        propertyAmenities: true,
+      },
+    });
+  }
 }
