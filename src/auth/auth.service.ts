@@ -91,56 +91,20 @@ export class AuthService {
 
   async login(loginDto: LoginDto): Promise<LoginResponse> {
     const account = await this.accountRepository.findOne({
-      where: {
-        username: loginDto.username,
-      },
+      where: [
+        {
+          username: loginDto.username,
+        },
+        {
+          user: {
+            email: loginDto.username,
+          },
+        },
+      ],
     });
 
-    if (!account) {
-      const user = await this.userRepository.findOne({
-        where: {
-          email: loginDto.username,
-        },
-        relations: {
-          account: true,
-        },
-        select: {
-          account: {
-            id: true,
-            username: true,
-          }
-        }
-      });
-
-
-      const salt = Buffer.from(user.account.passwordSalt, 'hex');
-
-      const iv = Buffer.from(user.account.iv, 'hex');
-
-      const decryptedPassword = await this.decryptData(
-        user.account.passwordHash,
-        loginDto.password,
-        salt,
-        iv,
-      ).catch(() => {
-        throw new UnauthorizedException(
-          'Username does not exist or wrong password!',
-        );
-      });
-
-      if (loginDto.password !== decryptedPassword)
-        throw new UnauthorizedException(
-          'Username does not exist or wrong password!',
-        );
-
-      const tokens = await this.getTokens(user.account.id, user.account.username);
-      await this.updateRefreshTokenHash(user.account.id, tokens.refreshToken, iv);
-
-      return {
-        user, 
-        tokens,
-      };
-    }
+    if (!account)
+      throw new UnauthorizedException('Username or email does not exist!');
 
     const salt = Buffer.from(account.passwordSalt, 'hex');
 
