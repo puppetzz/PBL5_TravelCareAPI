@@ -3,6 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Hotel } from './entities/hotel.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { PaginationResponse } from 'src/ultils/paginationResponse';
+import { PaginationDto } from './dto/pagination.dto';
+import { link } from 'fs';
 
 @Injectable()
 export class HotelService {
@@ -25,8 +28,11 @@ export class HotelService {
     }
     return false;
   }
-  async getAllHotels(): Promise<Hotel[]> {
-    return this.hotelRepository.find({
+  async getAllHotels(paginationDto: PaginationDto): Promise<{
+    data: Hotel[];
+    pagination: PaginationResponse;
+  }> {
+    const [data, pageSize] = await this.hotelRepository.findAndCount({
       relations: {
         location: {
           locationImages: true,
@@ -42,7 +48,20 @@ export class HotelService {
         hotelStyles: true,
         propertyAmenities: true,
       },
+      take: paginationDto.limit,
+      skip: (paginationDto.page - 1) * paginationDto.limit,
     });
+    const total = await this.hotelRepository.count();
+    const totalPage = Math.ceil(total / paginationDto.limit);
+
+    const pagination: PaginationResponse = {
+      pageNumber: paginationDto.page,
+      pageSize: pageSize,
+      total: total,
+      totalPage: totalPage,
+    };
+
+    return { data, pagination };
   }
 
   async getHotelById(id: string): Promise<Hotel> {
