@@ -1,17 +1,10 @@
-import {
-  Controller,
-  Delete,
-  Patch,
-  UploadedFile,
-  UploadedFiles,
-} from '@nestjs/common';
+import { Controller, Delete, Patch, UploadedFiles } from '@nestjs/common';
 import { RoomService } from './room.service';
 import {
   ApiOperation,
   ApiSecurity,
   ApiTags,
   ApiConsumes,
-  ApiBody,
 } from '@nestjs/swagger';
 import {
   Body,
@@ -20,10 +13,7 @@ import {
   HttpStatus,
   Param,
   Post,
-  UnauthorizedException,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
   UseInterceptors,
 } from '@nestjs/common';
 import { Room } from './entities/room.entity';
@@ -32,7 +22,6 @@ import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decor
 import { User } from 'src/user/entities/user.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiMultiFile } from 'src/ultils/imagesSwagger';
-import { FilesToBodyInterceptor } from 'src/locations/api-file.decorator';
 import { RoomDto } from './dto/room.dto';
 
 @Controller('rooms')

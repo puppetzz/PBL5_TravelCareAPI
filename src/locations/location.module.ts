@@ -12,6 +12,7 @@ import { LocationImage } from './entities/location-image.entity';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { HotelStyle } from 'src/hotels/entities/hotel-style.entity';
 import { PropertyAmenity } from 'src/hotels/entities/property-amenity.entity';
+import { WishlistModule } from 'src/wishlists/wishList.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -26,6 +27,7 @@ import { PropertyAmenity } from 'src/hotels/entities/property-amenity.entity';
     ]),
     AddressModule,
     S3Module,
+    WishlistModule,
   ],
   controllers: [LocationController],
   providers: [LocationService],

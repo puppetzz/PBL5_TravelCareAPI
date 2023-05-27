@@ -1,6 +1,6 @@
 import { User } from 'src/user/entities/user.entity';
 import { Location } from 'src/locations/entities/location.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class WishList {

@@ -14,6 +14,8 @@ import { UpdateLocationDto } from './dto/updateLocation.dto';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { PropertyAmenity } from 'src/hotels/entities/property-amenity.entity';
 import { HotelStyle } from 'src/hotels/entities/hotel-style.entity';
+import { PaginationResponse } from 'src/ultils/paginationResponse';
+import { Pagination } from 'nestjs-typeorm-paginate';
 @Injectable()
 export class LocationService {
   constructor(
@@ -37,7 +39,9 @@ export class LocationService {
     private readonly addressService: AddressService,
   ) {}
 
-  async getLocations(filterDTO: FilterDto): Promise<Location[]> {
+  async getLocations(
+    filterDTO: FilterDto,
+  ): Promise<{ data: Location[]; pagination: PaginationResponse }> {
     const { search, page, limit } = filterDTO;
     const locations = await this.locationRepository
       .createQueryBuilder('location')
@@ -65,9 +69,17 @@ export class LocationService {
     if (page && limit) {
       locations.take(limit).skip((page - 1) * limit);
     }
-    const result = await locations.getMany();
+    const [data, totalCount] = await locations.getManyAndCount();
+    const totalPage = Math.ceil(totalCount / (limit || 10));
+    const total = await this.locationRepository.count();
+    const pagination: PaginationResponse = {
+      pageNumber: page || 1,
+      pageSize: limit || 10,
+      total: total,
+      totalPage: totalPage,
+    };
 
-    return result;
+    return { data, pagination };
   }
 
   async createLocation(

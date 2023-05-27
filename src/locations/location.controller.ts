@@ -33,17 +33,22 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FilesToBodyInterceptor } from './api-file.decorator';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
+import { WishlistService } from 'src/wishlists/wishList.service';
+import { PaginationResponse } from 'src/ultils/paginationResponse';
 
 @Controller('locations')
 @ApiTags('location')
 export class LocationController {
   private logger = new Logger(LocationController.name);
-  constructor(private locationService: LocationService) {}
+  constructor(
+    private locationService: LocationService,
+    private wishlistService: WishlistService,
+  ) {}
 
   @Get()
   getLocations(
     @Query(ValidationPipe) filterDto: FilterDto,
-  ): Promise<Location[]> {
+  ): Promise<{ data: Location[]; pagination: PaginationResponse }> {
     const { page = defaultPage, limit = defaultLimit } = filterDto;
     return this.locationService.getLocations({ ...filterDto, page, limit });
   }
@@ -92,5 +97,17 @@ export class LocationController {
       throw new UnauthorizedException('User not Administrator');
     }
     return this.locationService.deleteLocation(id);
+  }
+
+  @Post('/:locationId/WishList')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Create wishlist for user' })
+  @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
+  async createWishList(
+    @GetCurrentAccount() user: User,
+    @Param('locationId') locationId: string,
+  ) {
+    return await this.wishlistService.createWishList(user, locationId);
   }
 }
