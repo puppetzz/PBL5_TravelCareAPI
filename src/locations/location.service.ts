@@ -70,11 +70,12 @@ export class LocationService {
       locations.take(limit).skip((page - 1) * limit);
     }
     const [data, totalCount] = await locations.getManyAndCount();
-    const totalPage = Math.ceil(totalCount / (limit || 10));
     const total = await this.locationRepository.count();
+    const totalPage = Math.ceil(total / limit);
+
     const pagination: PaginationResponse = {
-      pageNumber: page || 1,
-      pageSize: limit || 10,
+      pageNumber: page,
+      pageSize: totalCount,
       total: total,
       totalPage: totalPage,
     };
