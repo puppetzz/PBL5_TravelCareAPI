@@ -293,8 +293,10 @@ export class LocationService {
     });
     return result;
   }
-  async getLocationById(id: string): Promise<Location> {
-    return await this.locationRepository.findOne({
+  async getLocationById(
+    id: string,
+  ): Promise<{ data: Location; imageUrlLocation: string[] }> {
+    const data = await this.locationRepository.findOne({
       where: {
         id: id,
       },
@@ -311,8 +313,21 @@ export class LocationService {
           hotelStyles: true,
           propertyAmenities: true,
         },
+        reviews: {
+          reviewImages: true,
+        },
       },
     });
+    const imageUrlLocation = [];
+    for (const image of data.locationImages) {
+      imageUrlLocation.push(image.imageUrl);
+    }
+    for (const review of data.reviews) {
+      for (const image of review.reviewImages) {
+        imageUrlLocation.push(image.imageUrl);
+      }
+    }
+    return { data, imageUrlLocation };
   }
   async deleteLocation(id: string): Promise<void> {
     await this.locationRepository.delete(id);
