@@ -39,7 +39,7 @@ export class AddressService {
       );
     }
 
-    const newAddress = await this.addressRepository.create({
+    const newAddress = this.addressRepository.create({
       country,
       streetAddress,
     });
@@ -47,7 +47,9 @@ export class AddressService {
     if (provinceId) {
       const province = await this.provinceRepository.findOneBy({
         id: provinceId,
-        country: country,
+        country: {
+          id: country.id,
+        },
       });
 
       if (!province)
@@ -66,7 +68,9 @@ export class AddressService {
 
       const district = await this.districtRepository.findOneBy({
         id: districtId,
-        province: newAddress.province,
+        province: {
+          id: newAddress.province.id,
+        },
       });
 
       if (!district)
@@ -85,7 +89,9 @@ export class AddressService {
 
       const ward = await this.wardRepository.findOneBy({
         id: wardId,
-        district: newAddress.district,
+        district: {
+          id: newAddress.district.id,
+        },
       });
 
       if (!ward)
@@ -146,7 +152,9 @@ export class AddressService {
       const province = await this.provinceRepository.findOne({
         where: {
           id: provinceId,
-          country: address.country,
+          country: {
+            id: address.country.id,
+          },
         },
       });
 
@@ -167,7 +175,9 @@ export class AddressService {
       const district = await this.districtRepository.findOne({
         where: {
           id: districtId,
-          province: address.province,
+          province: {
+            id: address.province.id,
+          },
         },
       });
 
@@ -186,7 +196,9 @@ export class AddressService {
       const ward = await this.wardRepository.findOne({
         where: {
           id: wardId,
-          district: address.district,
+          district: {
+            id: address.district.id,
+          },
         },
       });
 
@@ -234,21 +246,25 @@ export class AddressService {
 
   async getProvinceByCountry(countryId: string): Promise<Province[]> {
     const country = await this.countryRepository.findOneBy({ id: countryId });
-    return await this.provinceRepository.findBy({ country: country });
+    return await this.provinceRepository.findBy({
+      country: { id: country.id },
+    });
   }
 
   async getDistrictByProvince(provinceId: string): Promise<District[]> {
     const province = await this.provinceRepository.findOneBy({
       id: provinceId,
     });
-    return await this.districtRepository.findBy({ province: province });
+    return await this.districtRepository.findBy({
+      province: { id: province.id },
+    });
   }
 
   async getWardByDistrict(districtId: string): Promise<Ward[]> {
     const district = await this.districtRepository.findOneBy({
       id: districtId,
     });
-    return await this.wardRepository.findBy({ district: district });
+    return await this.wardRepository.findBy({ district: { id: district.id } });
   }
 
   async getAll(): Promise<Country[]> {

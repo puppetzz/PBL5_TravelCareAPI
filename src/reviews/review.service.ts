@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
 import { Repository } from 'typeorm';
 import { Location } from 'src/locations/entities/location.entity';
-import { User } from 'src/user/entities/user.entity'
+import { User } from 'src/user/entities/user.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { TripType } from './entities/trip-type.entity';
 import { ReviewImage } from './entities/review-image.entity';
@@ -19,7 +19,7 @@ export class ReviewService {
     private readonly locationRepository: Repository<Location>,
     @InjectRepository(ReviewImage)
     private readonly reviewImageRepository: Repository<ReviewImage>,
-    @InjectRepository(TripType) 
+    @InjectRepository(TripType)
     private readonly tripTypeRepository: Repository<TripType>,
     private readonly s3Service: S3Service,
   ) {}
@@ -127,12 +127,15 @@ export class ReviewService {
     return await this.tripTypeRepository.find();
   }
 
-  async createReview(user: User, createReviewDto: CreateReviewDto): Promise<Review> {
+  async createReview(
+    user: User,
+    createReviewDto: CreateReviewDto,
+  ): Promise<Review> {
     const location = await this.locationRepository.findOne({
       where: {
         id: createReviewDto.locationId,
-      }
-    })
+      },
+    });
 
     location.reviewCount += 1;
 
@@ -142,9 +145,11 @@ export class ReviewService {
       throw new BadRequestException('Location does not exist!');
     }
 
-    const tripType = await this.tripTypeRepository.findOneBy({ id: createReviewDto.tripTypeId });
-    if (!tripType)  {
-      throw new BadRequestException('TripType does not exist!')
+    const tripType = await this.tripTypeRepository.findOneBy({
+      id: createReviewDto.tripTypeId,
+    });
+    if (!tripType) {
+      throw new BadRequestException('TripType does not exist!');
     }
 
     const review = this.reviewRepository.create({
@@ -155,14 +160,14 @@ export class ReviewService {
       tripType: tripType,
       user: user,
       location: location,
-    }); 
+    });
 
     await this.reviewRepository.save(review);
 
     if (createReviewDto.images) {
-      for (let image of createReviewDto.images) {
+      for (const image of createReviewDto.images) {
         const { key, url } = await this.s3Service.uploadImage(image);
-        console.log(image)
+        console.log(image);
         const reviewImage = this.reviewImageRepository.create({
           review: review,
           imageKey: key,
@@ -202,7 +207,7 @@ export class ReviewService {
 
     return newReview;
   }
-  
+
   async updateReview(user: User, updateReviewDto: UpdateReviewDto) {
     const review = await this.reviewRepository.findOne({
       where: {
@@ -214,15 +219,18 @@ export class ReviewService {
       },
     });
 
-    if (!review) 
-      throw new BadRequestException('Review does not exist');
+    if (!review) throw new BadRequestException('Review does not exist');
 
     if (user.accountId !== review.user.accountId)
-      throw new BadRequestException('User must be the review owner to update a review!');
+      throw new BadRequestException(
+        'User must be the review owner to update a review!',
+      );
 
     if (updateReviewDto.tripTypeId) {
       if (updateReviewDto.tripTypeId !== review.tripType.id) {
-        const tripType = await this.tripTypeRepository.findOneBy({ id: updateReviewDto.tripTypeId });
+        const tripType = await this.tripTypeRepository.findOneBy({
+          id: updateReviewDto.tripTypeId,
+        });
 
         review.tripType = tripType;
       }
@@ -235,14 +243,14 @@ export class ReviewService {
     review.updateAt = new Date();
 
     if (updateReviewDto.images) {
-      for (let image of updateReviewDto.images) {
+      for (const image of updateReviewDto.images) {
         const { key, url } = await this.s3Service.uploadImage(image);
 
         const reviewImage = this.reviewImageRepository.create({
           review: review,
           imageKey: key,
           imageUrl: url,
-        })
+        });
 
         await this.reviewImageRepository.save(reviewImage);
       }
@@ -288,7 +296,7 @@ export class ReviewService {
       relations: {
         user: true,
         reviewImages: true,
-      }
+      },
     });
 
     if (!review) {
@@ -298,28 +306,31 @@ export class ReviewService {
     const reviewImage = await this.reviewImageRepository.findOne({
       where: {
         id: reviewImageId,
-      }
-    })
+      },
+    });
 
-    if (!reviewImage) 
+    if (!reviewImage)
       throw new BadRequestException('ReviewImage does not exist!');
 
     if (user.accountId !== review.user.accountId) {
-      throw new BadRequestException('User must be the review owner to delete a reviewImage!')
+      throw new BadRequestException(
+        'User must be the review owner to delete a reviewImage!',
+      );
     }
 
-    const deleteResult = await this.reviewImageRepository.delete(reviewImage);
+    const deleteResult = await this.reviewImageRepository.delete(
+      reviewImage.id,
+    );
 
-    if (deleteResult.affected > 0) 
-      return 'Deleted successfully!';
+    if (deleteResult.affected > 0) return 'Deleted successfully!';
 
-    return 'Nothing affected!'
+    return 'Nothing affected!';
   }
 
   async deleteReivew(user: User, reviewId: string): Promise<string> {
-    const review = await this.reviewRepository.findOne({ 
-      where: { 
-        id: reviewId 
+    const review = await this.reviewRepository.findOne({
+      where: {
+        id: reviewId,
       },
       relations: {
         user: true,
@@ -332,15 +343,15 @@ export class ReviewService {
 
     if (user.role !== 'admin') {
       if (user.accountId !== review.user.accountId) {
-        throw new BadRequestException('User must be the review owner to delete a review!');
+        throw new BadRequestException(
+          'User must be the review owner to delete a review!',
+        );
       }
     }
 
-    const deleteResult = await this.reviewRepository.delete({ id: review.id })
-    if (deleteResult?.affected > 0)
-      return 'Deleted successfully!'
+    const deleteResult = await this.reviewRepository.delete({ id: review.id });
+    if (deleteResult?.affected > 0) return 'Deleted successfully!';
 
     return 'Nothing affected!';
   }
 }
-

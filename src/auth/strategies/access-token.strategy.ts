@@ -31,7 +31,11 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException();
     }
     const user = await this.userRepository.findOne({
-      where: { account },
+      where: {
+        account: {
+          id: account.id,
+        },
+      },
     });
 
     return user;
