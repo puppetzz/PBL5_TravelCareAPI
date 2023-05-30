@@ -7,6 +7,8 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  AfterLoad,
+  VirtualColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Address } from '../../address/entities/address.entity';
@@ -74,4 +76,42 @@ export class Location {
 
   @OneToOne(() => Hotel, (hotel) => hotel.location)
   hotel: Hotel;
+
+  @AfterLoad()
+  calculateAverageRating() {
+    if (!this.reviews || this.reviews.length === 0) {
+      this.rating = 0;
+    } else {
+      const sum = this.reviews.reduce(
+        (total, review) => total + review.rating,
+        0,
+      );
+      this.rating = sum / this.reviews.length;
+    }
+  }
+
+  imageUrlLocations: string[];
+  @AfterLoad()
+  imageUrlLocation() {
+    const imageUrl = [];
+
+    // Logic for calculating the virtual column
+    if (this.locationImages && this.locationImages.length > 0) {
+      for (const image of this.locationImages) {
+        imageUrl.push(image.imageUrl);
+      }
+    }
+
+    if (this.reviews) {
+      for (const review of this.reviews) {
+        if (review.reviewImages) {
+          for (const reviewImage of review.reviewImages) {
+            imageUrl.push(reviewImage.imageUrl);
+          }
+        }
+      }
+    }
+
+    this.imageUrlLocations = imageUrl;
+  }
 }
