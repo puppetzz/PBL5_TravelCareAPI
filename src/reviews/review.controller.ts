@@ -12,14 +12,20 @@ import {
 } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { Review } from './entities/review.entity';
-import { ApiConsumes, ApiOkResponse, ApiParam, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiOkResponse,
+  ApiParam,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FilesToBodyInterceptor } from 'src/locations/api-file.decorator';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { TripType } from './entities/trip-type.entity'
+import { TripType } from './entities/trip-type.entity';
 import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Controller('review')
@@ -47,13 +53,20 @@ export class ReviewController {
   @ApiOkResponse({ type: Review, isArray: true })
   @ApiSecurity('JWT-auth')
   @UseGuards(AccessTokenGuard)
-  getReviewbyCurrentUser(@GetCurrentAccount() user: User): Promise<Review[]>{
+  getReviewbyCurrentUser(@GetCurrentAccount() user: User): Promise<Review[]> {
     return this.reviewService.getReviewByCurrentUser(user);
   }
 
+  @Get('/get-review/:reviewId')
+  @ApiOkResponse({ type: Review })
+  getReviewById(
+    @Param('reviewId', new ParseUUIDPipe()) reviewId: string,
+  ): Promise<Review> {
+    return this.reviewService.getReviewById(reviewId);
+  }
 
   @Get('/get-trip-type')
-  @ApiOkResponse({ type: TripType, isArray: true})
+  @ApiOkResponse({ type: TripType, isArray: true })
   getTripType(): Promise<TripType[]> {
     return this.reviewService.getTripType();
   }
@@ -66,7 +79,7 @@ export class ReviewController {
   @UseInterceptors(FilesInterceptor('images'), FilesToBodyInterceptor)
   createReview(
     @GetCurrentAccount() user: User,
-    @Body() createReviewDto: CreateReviewDto
+    @Body() createReviewDto: CreateReviewDto,
   ) {
     return this.reviewService.createReview(user, createReviewDto);
   }
@@ -84,26 +97,26 @@ export class ReviewController {
     return this.reviewService.updateReview(user, updateReviewDto);
   }
 
-  @Delete('delete-review-image/:reviewId/:reviewImageId') 
+  @Delete('delete-review-image/:reviewId/:reviewImageId')
   @ApiOkResponse({ type: Review })
   @ApiSecurity('JWT-auth')
   @UseGuards(AccessTokenGuard)
   deleteReviewImage(
     @GetCurrentAccount() user: User,
     @Param('reviewId', new ParseUUIDPipe()) reviewId: string,
-    @Param('reviewImageId',  new ParseUUIDPipe()) reviewImageId: string,
+    @Param('reviewImageId', new ParseUUIDPipe()) reviewImageId: string,
   ) {
     return this.reviewService.deleteReviewImage(user, reviewId, reviewImageId);
   }
 
   @Delete('delete-review/:reviewId')
   @ApiOkResponse({ type: String })
-  @ApiParam({ name: 'reviewId', type: String, required: true})
+  @ApiParam({ name: 'reviewId', type: String, required: true })
   @ApiSecurity('JWT-auth')
   @UseGuards(AccessTokenGuard)
   deleteReview(
-    @GetCurrentAccount() user: User, 
-    @Param('reviewId', new ParseUUIDPipe()) reviewId: string
+    @GetCurrentAccount() user: User,
+    @Param('reviewId', new ParseUUIDPipe()) reviewId: string,
   ) {
     return this.reviewService.deleteReivew(user, reviewId);
   }

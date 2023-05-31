@@ -45,13 +45,6 @@ export class ReviewService {
         tripType: true,
       },
       select: {
-        id: true,
-        rating: true,
-        reviewAt: true,
-        updateAt: true,
-        tripTime: true,
-        title: true,
-        content: true,
         user: {
           accountId: true,
           firstName: true,
@@ -66,7 +59,12 @@ export class ReviewService {
           },
         },
       },
+      order: {
+        reviewAt: 'DESC',
+      },
     });
+
+    if (!reviews) throw new BadRequestException('Reviews do not exist!');
 
     return reviews;
   }
@@ -92,13 +90,6 @@ export class ReviewService {
         tripType: true,
       },
       select: {
-        id: true,
-        rating: true,
-        reviewAt: true,
-        updateAt: true,
-        tripTime: true,
-        title: true,
-        content: true,
         user: {
           accountId: true,
           firstName: true,
@@ -113,7 +104,12 @@ export class ReviewService {
           },
         },
       },
+      order: {
+        reviewAt: 'DESC',
+      },
     });
+
+    if (!reviews) throw new BadRequestException('Reviews do not exist!');
 
     return reviews;
   }
@@ -125,6 +121,50 @@ export class ReviewService {
 
   async getTripType(): Promise<TripType[]> {
     return await this.tripTypeRepository.find();
+  }
+
+  async getReviewById(reviewid: string): Promise<Review> {
+    const review = await this.reviewRepository.findOne({
+      where: {
+        id: reviewid,
+      },
+      relations: {
+        user: {
+          account: true,
+          address: {
+            country: true,
+            province: true,
+            district: true,
+            ward: true,
+          },
+        },
+        reviewImages: true,
+        tripType: true,
+        location: true,
+      },
+      select: {
+        user: {
+          accountId: true,
+          firstName: true,
+          lastName: true,
+          profileImageUrl: true,
+          account: {
+            username: true,
+          },
+          address: {
+            id: true,
+            streetAddress: true,
+          },
+        },
+        location: {
+          id: true,
+        },
+      },
+    });
+
+    if (!review) throw new BadRequestException('Review is not exist!');
+
+    return review;
   }
 
   async createReview(
