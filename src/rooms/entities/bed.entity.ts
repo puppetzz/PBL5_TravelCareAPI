@@ -9,6 +9,9 @@ export class Bed {
   @Column({ nullable: false })
   type: string;
 
+  @Column({ nullable: false })
+  icon: string;
+
   @OneToMany(() => RoomBed, (roomBed) => roomBed.bed)
   roomBeds: RoomBed[];
 }

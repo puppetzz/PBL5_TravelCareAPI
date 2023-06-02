@@ -9,6 +9,9 @@ export class PropertyAmenity {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ nullable: false})
+  icon: string;
+
   @ManyToMany(() => Hotel, (hotel) => hotel.propertyAmenities)
   hotels: Hotel[];
 }
