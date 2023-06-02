@@ -1,4 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { isArray } from 'class-validator';
+
+export class RoomBed {
+  @ApiProperty()
+  bedId: string;
+  @ApiProperty()
+  numberOfBed: number;
+}
 
 export class RoomDto {
   @ApiProperty()
@@ -17,4 +25,9 @@ export class RoomDto {
   roomFeatureIds?: string[];
   @ApiPropertyOptional()
   roomTypeIds?: string[];
+  @ApiPropertyOptional({
+    isArray: true,
+    type: RoomBed,
+  })
+  roomBeds?: RoomBed[];
 }

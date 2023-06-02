@@ -45,6 +45,8 @@ export class HotelController {
     if (!(await this.hotelService.checkIfOwner(hotelId, user))) {
       throw new UnauthorizedException('User is not owner of this hotel');
     }
+    console.log(typeof createRoomDto.roomBeds);
+
     return this.roomService.createRoom(hotelId, createRoomDto);
   }
 

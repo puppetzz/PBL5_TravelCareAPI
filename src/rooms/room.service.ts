@@ -15,6 +15,8 @@ import { HotelService } from 'src/hotels/hotel.service';
 import { User } from 'src/user/entities/user.entity';
 import { RoomImage } from './entities/room-image.entity';
 import { S3Service } from 'src/aws-s3/s3.service';
+import { Bed } from './entities/bed.entity';
+import { RoomBed } from './entities/room-bed.entity';
 
 @Injectable()
 export class RoomService {
@@ -31,6 +33,10 @@ export class RoomService {
     private roomTypeRepository: Repository<RoomType>,
     @InjectRepository(RoomImage)
     private roomImageRepository: Repository<RoomImage>,
+    @InjectRepository(Bed)
+    private bedRepository: Repository<Bed>,
+    @InjectRepository(RoomBed)
+    private roomBedRepository: Repository<RoomBed>,
     private readonly hotelService: HotelService,
     private readonly s3Service: S3Service,
   ) {}
@@ -48,6 +54,7 @@ export class RoomService {
       discountIds,
       roomFeatureIds,
       roomTypeIds,
+      roomBeds,
     } = createRoomDto;
     const createRoom = await this.roomRepository.create({
       hotel: hotelOwner,
@@ -75,7 +82,38 @@ export class RoomService {
       });
       createRoom.roomTypes = roomTypes;
     }
-    return await this.roomRepository.save(createRoom);
+    const newRoom = await this.roomRepository.save(createRoom);
+
+    if (roomBeds) {
+      for (const roomBed of roomBeds) {
+        const bed = await this.bedRepository.findOneBy({
+          id: roomBed.bedId,
+        });
+        if (!bed) {
+          throw new NotFoundException(`Bed ${roomBed.bedId} does not exist`);
+        }
+        const newRoomBed = await this.roomBedRepository.create({
+          bed: bed,
+          numberOfBeds: roomBed.numberOfBed,
+          room: newRoom,
+        });
+        await this.roomBedRepository.save(newRoomBed);
+      }
+    }
+    return this.roomRepository.findOne({
+      where: {
+        id: newRoom.id,
+      },
+      relations: {
+        discounts: true,
+        roomTypes: true,
+        roomFeatures: true,
+        roomImages: true,
+        roomBeds: {
+          bed: true,
+        },
+      },
+    });
   }
   async updateRoom(
     roomId: string,
@@ -107,6 +145,7 @@ export class RoomService {
       discountIds,
       roomFeatureIds,
       roomTypeIds,
+      roomBeds,
     } = updateRoomDto;
     room.price = price;
     room.numberOfRooms = numberOfRooms;
@@ -132,6 +171,26 @@ export class RoomService {
       room.roomTypes = roomTypes;
     }
     await this.roomRepository.save(room);
+
+    if (roomBeds) {
+      room.roomBeds = null;
+      await this.roomRepository.save(room);
+      for (const roomBed of roomBeds) {
+        const bed = await this.bedRepository.findOneBy({
+          id: roomBed.bedId,
+        });
+        if (!bed) {
+          throw new NotFoundException(`Bed ${roomBed.bedId} does not exist`);
+        }
+        const newRoomBed = await this.roomBedRepository.create({
+          bed: bed,
+          numberOfBeds: roomBed.numberOfBed,
+          room: room,
+        });
+
+        await this.roomBedRepository.save(newRoomBed);
+      }
+    }
     return this.getRoomById(roomId);
   }
   async getRoomsByHotelId(hotelId: string): Promise<Room[]> {
@@ -141,7 +200,15 @@ export class RoomService {
           id: hotelId,
         },
       },
-      relations: ['discounts', 'roomTypes', 'roomFeatures', 'roomImages'],
+      relations: {
+        discounts: true,
+        roomTypes: true,
+        roomFeatures: true,
+        roomImages: true,
+        roomBeds: {
+          bed: true,
+        },
+      },
     });
     return rooms;
   }
@@ -150,7 +217,15 @@ export class RoomService {
       where: {
         id: roomId,
       },
-      relations: ['discounts', 'roomTypes', 'roomFeatures', 'roomImages'],
+      relations: {
+        discounts: true,
+        roomTypes: true,
+        roomFeatures: true,
+        roomImages: true,
+        roomBeds: {
+          bed: true,
+        },
+      },
     });
   }
   async deleteRoomById(roomId: string, user: User): Promise<void> {
