@@ -9,12 +9,6 @@ export class RoomType {
   @Column({ nullable: false })
   name: string;
 
-  @Column({ nullable: false })
-  numberOfBeds: number;
-
-  @Column({ nullable: true })
-  typeOfBeds: string;
-
   @ManyToMany(() => Room, (room) => room.roomTypes)
   rooms: Room[];
 }
