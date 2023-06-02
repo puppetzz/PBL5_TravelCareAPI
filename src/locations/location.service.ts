@@ -196,15 +196,32 @@ export class LocationService {
       where: {
         id: locationId,
       },
-      relations: ['address', 'locationImages', 'categories'],
+      relations: {
+        address: {
+          country: true,
+          province: true,
+          district: true,
+          ward: true,
+        },
+        categories: true,
+        locationImages: true,
+        hotel: {
+          hotelStyles: true,
+          propertyAmenities: true,
+        },
+      },
     });
-    console.log(updateLocation);
 
     const {
       name,
       about,
       description,
-      isHotel,
+      hotelStyleIds,
+      propertyAmenities,
+      hotelClass,
+      phoneNumber,
+      email,
+      website,
       categories,
       countryId,
       provinceId,
@@ -248,9 +265,37 @@ export class LocationService {
     if (description) {
       updateLocation.description = description;
     }
+    const isHotel = JSON.parse(updateLocationDto.isHotel);
     if (isHotel) {
-      updateLocation.isHotel = isHotel;
+      if (hotelStyleIds) {
+        const hotelArray = hotelStyleIds.split(',');
+        const hotelStyle = await this.hotelStyleRepository.findBy({
+          id: In(hotelArray),
+        });
+        updateLocation.hotel.hotelStyles = hotelStyle;
+      }
+      if (propertyAmenities) {
+        const propertyArray = propertyAmenities.split(',');
+        const properties = await this.propertyAmenityRepository.findBy({
+          id: In(propertyArray),
+        });
+        updateLocation.hotel.propertyAmenities = properties;
+      }
+      if (hotelClass) {
+        updateLocation.hotel.hotelClass = hotelClass;
+      }
+      if (phoneNumber) {
+        updateLocation.hotel.phoneNumber = phoneNumber;
+      }
+      if (website) {
+        updateLocation.hotel.website = website;
+      }
+      if (email) {
+        updateLocation.hotel.email = email;
+      }
+      await this.hotelRepository.save(updateLocation.hotel);
     }
+
     updateLocation.address = updateAddress;
 
     await this.locationRepository.save(updateLocation);
@@ -289,8 +334,22 @@ export class LocationService {
       where: {
         id: locationId,
       },
-      relations: ['address', 'locationImages', 'categories', 'hotel'],
+      relations: {
+        address: {
+          country: true,
+          province: true,
+          district: true,
+          ward: true,
+        },
+        categories: true,
+        locationImages: true,
+        hotel: {
+          hotelStyles: true,
+          propertyAmenities: true,
+        },
+      },
     });
+
     return result;
   }
   async getLocationById(id: string): Promise<Location> {

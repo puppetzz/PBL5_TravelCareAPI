@@ -9,7 +9,19 @@ export class UpdateLocationDto {
   @ApiPropertyOptional()
   description: string;
   @ApiPropertyOptional()
-  isHotel: boolean;
+  isHotel: string;
+  @ApiPropertyOptional()
+  phoneNumber?: string;
+  @ApiPropertyOptional()
+  email?: string;
+  @ApiPropertyOptional()
+  website?: string;
+  @ApiPropertyOptional()
+  hotelClass?: number;
+  @ApiPropertyOptional()
+  propertyAmenities?: string;
+  @ApiPropertyOptional()
+  hotelStyleIds?: string;
   @ApiPropertyOptional()
   countryId: string;
   @ApiPropertyOptional()
