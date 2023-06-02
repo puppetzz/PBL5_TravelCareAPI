@@ -42,7 +42,7 @@ export class RoomService {
     const {
       price,
       numberOfRooms,
-      avaliableRooms,
+      availableRooms,
       sleeps,
       isPrepay,
       discountIds,
@@ -52,7 +52,7 @@ export class RoomService {
     const createRoom = await this.roomRepository.create({
       hotel: hotelOwner,
       price,
-      avaliableRooms,
+      availableRooms,
       numberOfRooms,
       sleeps,
       isPrepay,
@@ -101,7 +101,7 @@ export class RoomService {
     const {
       price,
       numberOfRooms,
-      avaliableRooms,
+      availableRooms,
       sleeps,
       isPrepay,
       discountIds,
@@ -110,7 +110,7 @@ export class RoomService {
     } = updateRoomDto;
     room.price = price;
     room.numberOfRooms = numberOfRooms;
-    room.avaliableRooms = avaliableRooms;
+    room.availableRooms = availableRooms;
     room.sleeps = sleeps;
     room.isPrepay = isPrepay;
     if (discountIds) {

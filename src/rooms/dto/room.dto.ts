@@ -6,7 +6,7 @@ export class RoomDto {
   @ApiProperty()
   numberOfRooms?: number;
   @ApiProperty()
-  avaliableRooms: number;
+  availableRooms: number;
   @ApiProperty()
   sleeps?: number;
   @ApiProperty()
