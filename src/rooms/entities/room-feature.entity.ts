@@ -9,6 +9,9 @@ export class RoomFeature {
   @Column({ nullable: false })
   name: string;
 
+  @Column({ nullable: false })
+  icon: string;
+
   @ManyToMany(() => Room, (room) => room.roomFeatures)
   rooms: Room[];
 }
