@@ -17,6 +17,7 @@ import { PropertyAmenityModule } from './hotels/property-amenity.module';
 import { RoomTypeModule } from './rooms/room-type.module';
 import { RoomFeatureModule } from './rooms/room-feature.module';
 import { DiscountModule } from './rooms/discount.module';
+import { BedModule } from './rooms/bed.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { DiscountModule } from './rooms/discount.module';
     WishlistModule,
     HotelStyleModule,
     PropertyAmenityModule,
+    BedModule,
   ],
 })
 export class AppModule {}

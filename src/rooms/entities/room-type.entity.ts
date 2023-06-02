@@ -9,6 +9,7 @@ export class RoomType {
   @Column({ nullable: false })
   name: string;
 
+
   @Column({ nullable: false })
   icon: string;
 

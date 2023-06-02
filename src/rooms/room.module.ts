@@ -13,6 +13,8 @@ import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { HotelModule } from 'src/hotels/hotels.module';
 import { RoomImage } from './entities/room-image.entity';
 import { S3Module } from 'src/aws-s3/s3.module';
+import { Bed } from './entities/bed.entity';
+import { RoomBed } from './entities/room-bed.entity';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { S3Module } from 'src/aws-s3/s3.module';
       RoomType,
       Hotel,
       RoomImage,
+      Bed,
+      RoomBed,
     ]),
     DiscountModule,
     RoomFeatureModule,
