@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +6,8 @@ import { S3Service } from 'src/aws-s3/s3.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Account } from 'src/auth/entities/account.entity';
 import { AddressService } from 'src/address/address.service';
+import { PaginationResponse } from 'src/ultils/paginationResponse';
+import { FilterDto } from './dto/filter.dto';
 
 @Injectable()
 export class UserService {
@@ -119,5 +121,46 @@ export class UserService {
     const userUpdated = await this.userRepository.save(user);
 
     return userUpdated;
+  }
+  async getAllUsers(
+    user: User,
+    filterDto: FilterDto,
+  ): Promise<{
+    data: User[];
+    pagination: PaginationResponse;
+  }> {
+    if (!this.checkRoleAdmin(user)) {
+      throw new UnauthorizedException('User not Administrator');
+    }
+    const { search, page, limit } = filterDto;
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .take(limit)
+      .skip((page - 1) * limit);
+    if (search) {
+      const searchLower = search.toLowerCase();
+      users.where(
+        `(CONCAT(LOWER(user.lastName), ', ', LOWER(user.firstName)  LIKE :name)`,
+        { name: `%${searchLower}%` },
+      );
+    }
+    const data = await users.getMany();
+
+    const total = await this.userRepository.count();
+    const totalPage = Math.ceil(total / limit);
+
+    const pagination: PaginationResponse = {
+      pageNumber: page,
+      pageSize: limit,
+      total: total,
+      totalPage: totalPage,
+    };
+    return { data, pagination };
+  }
+  async checkRoleAdmin(user: User): Promise<boolean> {
+    if (user.role.toString().toLowerCase().includes('admin')) {
+      return true;
+    }
+    return false;
   }
 }

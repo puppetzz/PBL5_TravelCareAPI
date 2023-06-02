@@ -6,9 +6,11 @@ import {
   HttpCode,
   HttpStatus,
   Patch,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -23,6 +25,8 @@ import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decor
 import { User } from './entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FilterDto } from './dto/filter.dto';
+import { defaultLimit, defaultPage } from 'src/constant/constant';
 
 @Controller('user')
 @ApiTags('user')
@@ -98,5 +102,19 @@ export class UserController {
     @GetCurrentAccount('accountId') id: string,
   ) {
     return this.userService.updateUser(id, updateUserDto);
+  }
+
+  @Get('/users')
+  @HttpCode(HttpStatus.OK)
+  @ApiSecurity('JWT-auth')
+  @UseGuards(AccessTokenGuard)
+  getAllUsers(
+    @GetCurrentAccount() user: User,
+    @Query(ValidationPipe) filterDto: FilterDto,
+  ) {
+    const { page = defaultPage, limit = defaultLimit } = filterDto;
+    console.log({ ...filterDto, page, limit });
+
+    return this.userService.getAllUsers(user, { ...filterDto, page, limit });
   }
 }
