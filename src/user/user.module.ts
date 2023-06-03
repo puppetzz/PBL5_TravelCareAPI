@@ -6,9 +6,15 @@ import { UserService } from './user.service';
 import { S3Module } from 'src/aws-s3/s3.module';
 import { AddressModule } from 'src/address/address.module';
 import { Account } from 'src/auth/entities/account.entity';
+import { HotelModule } from 'src/hotels/hotels.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Account]), S3Module, AddressModule],
+  imports: [
+    TypeOrmModule.forFeature([User, Account]),
+    S3Module,
+    AddressModule,
+    HotelModule,
+  ],
   controllers: [UserController],
   providers: [UserService],
 })
