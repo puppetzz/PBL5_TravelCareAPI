@@ -86,4 +86,32 @@ export class HotelService {
       },
     });
   }
+
+  async getHotelsForOwner(user: User): Promise<Hotel[]> {
+    const hotels = await this.hotelRepository.find({
+      relations: {
+        location: {
+          locationImages: true,
+          categories: true,
+          address: {
+            country: true,
+            province: true,
+            district: true,
+            ward: true,
+          },
+          hotel: false,
+        },
+        hotelStyles: true,
+        propertyAmenities: true,
+      },
+      where: {
+        location: {
+          user: {
+            accountId: user.accountId,
+          },
+        },
+      },
+    });
+    return hotels;
+  }
 }

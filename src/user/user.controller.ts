@@ -17,6 +17,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOkResponse,
+  ApiOperation,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -27,11 +28,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FilterDto } from './dto/filter.dto';
 import { defaultLimit, defaultPage } from 'src/constant/constant';
+import { HotelService } from 'src/hotels/hotel.service';
 
 @Controller('user')
 @ApiTags('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly hotelService: HotelService,
+  ) {}
 
   @Get()
   @ApiOkResponse({ type: User })
@@ -104,6 +109,14 @@ export class UserController {
     return this.userService.updateUser(id, updateUserDto);
   }
 
+  @Get('/hotels')
+  @ApiSecurity('JWT-auth')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get hotels for owner' })
+  async getHotelsForOwner(@GetCurrentAccount() user: User) {
+    return this.hotelService.getHotelsForOwner(user);
+  }
   @Get('/users')
   @HttpCode(HttpStatus.OK)
   @ApiSecurity('JWT-auth')
