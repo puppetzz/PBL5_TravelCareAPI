@@ -239,6 +239,17 @@ export class RoomService {
     if (!(await this.hotelService.checkIfOwner(hotel.id, user))) {
       throw new UnauthorizedException('User is not owner of this hotel');
     }
+    const room = await this.roomRepository.findOne({
+      relations: {
+        roomBeds: true,
+      },
+      where: {
+        id: roomId,
+      },
+    });
+    for (const roomBed of room?.roomBeds) {
+      await this.roomBedRepository.delete(roomBed.id);
+    }
     await this.roomRepository.delete(roomId);
   }
   async uploadImages(
