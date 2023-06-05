@@ -65,6 +65,7 @@ export class Location {
 
   @ManyToMany(() => Category, (category) => category.locations, {
     onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   categories: Category[];
 

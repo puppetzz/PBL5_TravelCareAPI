@@ -2,9 +2,11 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Patch,
   Query,
   UploadedFile,
@@ -129,5 +131,15 @@ export class UserController {
     console.log({ ...filterDto, page, limit });
 
     return this.userService.getAllUsers(user, { ...filterDto, page, limit });
+  }
+  @Delete('/admin/:accountId')
+  @HttpCode(HttpStatus.OK)
+  @ApiSecurity('JWT-auth')
+  @UseGuards(AccessTokenGuard)
+  deleteUser(
+    @GetCurrentAccount() user: User,
+    @Param('accountId') accountId: string,
+  ) {
+    return this.userService.deleteUser(user, accountId);
   }
 }

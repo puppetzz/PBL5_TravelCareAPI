@@ -75,6 +75,12 @@ export class UserService {
 
     return url;
   }
+  async deleteUser(user: User, accountId: string): Promise<void> {
+    if (!this.checkRoleAdmin(user)) {
+      throw new UnauthorizedException('User not Administrator');
+    }
+    await this.userRepository.delete(accountId);
+  }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({

@@ -18,7 +18,9 @@ export class Category {
   @ApiProperty()
   name: string;
 
-  @ManyToMany(() => Location, (location) => location.categories)
+  @ManyToMany(() => Location, (location) => location.categories, {
+    onDelete: 'CASCADE',
+  })
   @JoinTable()
   locations: Location[];
 }
