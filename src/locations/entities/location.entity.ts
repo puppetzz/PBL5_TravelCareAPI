@@ -8,7 +8,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   AfterLoad,
-  VirtualColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Address } from '../../address/entities/address.entity';
@@ -87,7 +86,8 @@ export class Location {
         (total, review) => total + review.rating,
         0,
       );
-      this.rating = sum / this.reviews.length;
+      const average = sum / this.reviews.length;
+      this.rating = Number(average.toFixed(1));
     }
   }
 
