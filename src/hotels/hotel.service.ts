@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hotel } from './entities/hotel.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +10,7 @@ import { User } from 'src/user/entities/user.entity';
 import { PaginationResponse } from 'src/ultils/paginationResponse';
 import { PaginationDto } from './dto/pagination.dto';
 import { link } from 'fs';
+import { defaulStatusRegisterLastProgress } from 'src/constant/constant';
 
 @Injectable()
 export class HotelService {
@@ -33,6 +38,7 @@ export class HotelService {
     pagination: PaginationResponse;
   }> {
     const [data, pageSize] = await this.hotelRepository.findAndCount({
+      where: { isRegistered: true },
       relations: {
         location: {
           locationImages: true,
@@ -45,6 +51,7 @@ export class HotelService {
           },
           hotel: false,
         },
+        rooms: true,
         hotelStyles: true,
         propertyAmenities: true,
       },
@@ -81,6 +88,7 @@ export class HotelService {
           },
           hotel: false,
         },
+        rooms: true,
         hotelStyles: true,
         propertyAmenities: true,
       },
@@ -101,6 +109,7 @@ export class HotelService {
           },
           hotel: false,
         },
+        rooms: true,
         hotelStyles: true,
         propertyAmenities: true,
       },
@@ -113,5 +122,17 @@ export class HotelService {
       },
     });
     return hotels;
+  }
+  async registerHotelForOwner(user: User, hotelId: string): Promise<Hotel> {
+    if (!(await this.checkIfOwner(hotelId, user))) {
+      throw new UnauthorizedException(`user not owner of ${hotelId}`);
+    }
+    const hotel = await this.getHotelById(hotelId);
+    if (hotel.statusRegisterProgress < defaulStatusRegisterLastProgress) {
+      throw new BadRequestException(`Please complete all the steps`);
+    }
+    hotel.isRegistered = true;
+    await this.hotelRepository.save(hotel);
+    return await this.getHotelById(hotelId);
   }
 }

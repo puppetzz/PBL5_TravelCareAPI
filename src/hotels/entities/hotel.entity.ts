@@ -1,6 +1,9 @@
 import { IsAlphanumeric, IsEmail } from 'class-validator';
 import { Location } from 'src/locations/entities/location.entity';
+import { defaulStatusRegisterProgress } from './../../constant/constant';
+
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinColumn,
@@ -35,6 +38,9 @@ export class Hotel {
   @Column({ nullable: false, type: 'int', default: 1 })
   hotelClass: number;
 
+  @Column({ nullable: false, default: false })
+  isRegistered: boolean;
+
   @OneToOne(() => Location, (location) => location.hotel, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
@@ -42,6 +48,8 @@ export class Hotel {
   })
   @JoinColumn()
   location: Location;
+
+  statusRegisterProgress: number;
 
   @OneToMany(() => HotelImage, (hotelImage) => hotelImage.hotel, {
     nullable: true,
@@ -74,4 +82,18 @@ export class Hotel {
   })
   @JoinTable()
   languages: Language[];
+
+  @AfterLoad()
+  caculateStatusProgress() {
+    this.statusRegisterProgress = defaulStatusRegisterProgress;
+    if (this?.rooms?.length) {
+      this.statusRegisterProgress += defaulStatusRegisterProgress;
+    }
+    if (this.location?.imageUrlLocations?.length) {
+      this.statusRegisterProgress += defaulStatusRegisterProgress;
+    }
+    if (this.isRegistered) {
+      this.statusRegisterProgress += defaulStatusRegisterProgress;
+    }
+  }
 }

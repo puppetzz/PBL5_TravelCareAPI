@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   Param,
+  Patch,
   Post,
   Query,
   UnauthorizedException,
@@ -70,5 +71,16 @@ export class HotelController {
   @ApiOperation({ summary: 'Get hotel by Id' })
   async getHotelById(@Param('hotelId') id: string): Promise<Hotel> {
     return this.hotelService.getHotelById(id);
+  }
+  @Patch('/:hotelId/register')
+  @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'register hotel by Owner' })
+  async registerHotelForOwner(
+    @Param('hotelId') id: string,
+    @GetCurrentAccount() user: User,
+  ): Promise<Hotel> {
+    return this.hotelService.registerHotelForOwner(user, id);
   }
 }
