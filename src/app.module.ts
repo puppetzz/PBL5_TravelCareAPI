@@ -18,6 +18,7 @@ import { RoomTypeModule } from './rooms/room-type.module';
 import { RoomFeatureModule } from './rooms/room-feature.module';
 import { DiscountModule } from './rooms/discount.module';
 import { BedModule } from './rooms/bed.module';
+import { PaypalModule } from './paypal/paypal.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { BedModule } from './rooms/bed.module';
     HotelStyleModule,
     PropertyAmenityModule,
     BedModule,
+    PaypalModule,
   ],
 })
 export class AppModule {}

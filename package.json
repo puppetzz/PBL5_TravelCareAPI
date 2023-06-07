@@ -24,6 +24,7 @@
     "migration:revert": "yarn run typeorm migration:revert"
   },
   "dependencies": {
+    "@nestjs/axios": "^2.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
@@ -36,6 +37,8 @@
     "@types/multer": "^1.4.7",
     "@types/passport-jwt": "^3.0.8",
     "aws-sdk": "^2.1341.0",
+    "axios": "^1.4.0",
+    "cashify": "2.5.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "dotenv": "^16.0.3",
