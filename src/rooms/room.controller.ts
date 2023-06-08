@@ -77,15 +77,15 @@ export class RoomController {
     return this.roomService.uploadImages(roomId, files, user);
   }
 
-  @Delete('/:roomId/deleteImages')
+  @Delete('/:roomId/deleteImages/:roomImageId')
   @UseGuards(AccessTokenGuard)
   @ApiSecurity('JWT-auth')
   @ApiOperation({ summary: 'delete images for room' })
   deleteRoomImages(
-    @Body() roomImageIds: string[],
     @GetCurrentAccount() user: User,
     @Param('roomId') roomId: string,
+    @Param('roomImageId') roomImageId: string,
   ) {
-    return this.roomService.deleteRoomImage(roomImageIds, roomId, user);
+    return this.roomService.deleteRoomImage(roomImageId, roomId, user);
   }
 }

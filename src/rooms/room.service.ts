@@ -296,7 +296,7 @@ export class RoomService {
     return this.getRoomById(roomId);
   }
   async deleteRoomImage(
-    roomImageIds: string[],
+    roomImageId: string,
     roomId: string,
     user: User,
   ): Promise<Room> {
@@ -311,7 +311,7 @@ export class RoomService {
       throw new UnauthorizedException('User is not owner of this hotel');
     }
 
-    await this.roomImageRepository.delete(roomImageIds);
+    await this.roomImageRepository.delete(roomImageId);
     return this.getRoomById(roomId);
   }
 }
