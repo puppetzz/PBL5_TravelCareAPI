@@ -264,7 +264,7 @@ export class RoomService {
     roomId: string,
     files: Express.Multer.File[],
     user: User,
-  ): Promise<RoomImage[]> {
+  ): Promise<Room> {
     const hotel = await this.hotelRepository.findOne({
       where: {
         rooms: {
@@ -276,7 +276,6 @@ export class RoomService {
       throw new UnauthorizedException('User is not owner of this hotel');
     }
 
-    const resImages = [];
     if (files) {
       const room = await this.roomRepository.findOneBy({
         id: roomId,
@@ -292,9 +291,27 @@ export class RoomService {
           room: room,
         });
         await this.roomImageRepository.save(roomImage);
-        resImages.push(roomImage);
       }
     }
-    return resImages;
+    return this.getRoomById(roomId);
+  }
+  async deleteRoomImage(
+    roomImageIds: string[],
+    roomId: string,
+    user: User,
+  ): Promise<Room> {
+    const hotel = await this.hotelRepository.findOne({
+      where: {
+        rooms: {
+          id: roomId,
+        },
+      },
+    });
+    if (!(await this.hotelService.checkIfOwner(hotel.id, user))) {
+      throw new UnauthorizedException('User is not owner of this hotel');
+    }
+
+    await this.roomImageRepository.delete(roomImageIds);
+    return this.getRoomById(roomId);
   }
 }

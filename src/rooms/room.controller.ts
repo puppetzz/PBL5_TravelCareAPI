@@ -5,6 +5,7 @@ import {
   ApiSecurity,
   ApiTags,
   ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import {
   Body,
@@ -74,5 +75,17 @@ export class RoomController {
     @GetCurrentAccount() user: User,
   ) {
     return this.roomService.uploadImages(roomId, files, user);
+  }
+
+  @Delete('/:roomId/deleteImages')
+  @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
+  @ApiOperation({ summary: 'delete images for room' })
+  deleteRoomImages(
+    @Body() roomImageIds: string[],
+    @GetCurrentAccount() user: User,
+    @Param('roomId') roomId: string,
+  ) {
+    return this.roomService.deleteRoomImage(roomImageIds, roomId, user);
   }
 }
