@@ -82,6 +82,7 @@ export class HotelService {
     }
 
     const [data, totalCount] = await hotels.getManyAndCount();
+
     const total = await this.hotelRepository.count({
       where: {
         isRegistered: true,
