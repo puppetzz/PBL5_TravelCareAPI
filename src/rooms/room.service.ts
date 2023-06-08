@@ -51,6 +51,8 @@ export class RoomService {
       availableRooms,
       sleeps,
       isPrepay,
+      isFreeCancellation,
+      freeCancellationPeriod,
       discountIds,
       roomFeatureIds,
       roomTypeIds,
@@ -63,6 +65,8 @@ export class RoomService {
       numberOfRooms,
       sleeps,
       isPrepay,
+      isFreeCancellation,
+      freeCancellationPeriod,
     });
     if (discountIds) {
       const discountEntities = await this.discountRepository.findBy({
@@ -143,6 +147,8 @@ export class RoomService {
       sleeps,
       isPrepay,
       discountIds,
+      isFreeCancellation,
+      freeCancellationPeriod,
       roomFeatureIds,
       roomTypeIds,
       roomBeds,
@@ -152,6 +158,8 @@ export class RoomService {
     room.availableRooms = availableRooms;
     room.sleeps = sleeps;
     room.isPrepay = isPrepay;
+    room.isFreeCancellation = isFreeCancellation;
+    room.freeCancellationPeriod = freeCancellationPeriod;
     if (discountIds) {
       const discountEntities = await this.discountRepository.findBy({
         id: In(discountIds),

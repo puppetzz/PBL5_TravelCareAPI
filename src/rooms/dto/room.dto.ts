@@ -25,6 +25,10 @@ export class RoomDto {
   roomFeatureIds?: string[];
   @ApiPropertyOptional()
   roomTypeIds?: string[];
+  @ApiPropertyOptional()
+  isFreeCancellation: boolean;
+  @ApiPropertyOptional()
+  freeCancellationPeriod: number;
   @ApiPropertyOptional({
     isArray: true,
     type: RoomBed,

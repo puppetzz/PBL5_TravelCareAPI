@@ -48,7 +48,7 @@ export class Room {
 
   @Column({ nullable: true })
   @ApiProperty()
-  freeCancellationPriod: number;
+  freeCancellationPeriod: number;
 
   @OneToMany(() => RoomImage, (roomImage) => roomImage.room)
   @ApiProperty()

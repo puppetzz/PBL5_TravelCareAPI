@@ -89,7 +89,7 @@ export class Hotel {
     if (this?.rooms?.length) {
       this.statusRegisterProgress += defaulStatusRegisterProgress;
     }
-    if (this.location?.imageUrlLocations?.length) {
+    if (this.location?.locationImages?.length) {
       this.statusRegisterProgress += defaulStatusRegisterProgress;
     }
     if (this.isRegistered) {
