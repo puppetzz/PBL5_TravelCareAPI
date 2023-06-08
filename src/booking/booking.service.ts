@@ -161,6 +161,8 @@ export class BookingService {
         checkOut,
       );
 
+      console.log(availableRooms);
+
       if (!room) throw new BadRequestException('room does not exist!');
 
       if (availableRooms <= 0)

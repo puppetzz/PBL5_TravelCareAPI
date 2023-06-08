@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Hotel } from './entities/hotel.entity';
 import { HotelImage } from './entities/hotel-image.entity';
@@ -9,6 +9,7 @@ import { HotelController } from './hotel.controller';
 import { HotelService } from './hotel.service';
 import { RoomModule } from 'src/rooms/room.module';
 import { Room } from 'src/rooms/entities/room.entity';
+import { BookingModule } from 'src/booking/booking.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { Room } from 'src/rooms/entities/room.entity';
       Language,
       Room,
     ]),
-    RoomModule,
+    forwardRef(() => RoomModule),
+    forwardRef(() => BookingModule),
   ],
   controllers: [HotelController],
   providers: [HotelService],

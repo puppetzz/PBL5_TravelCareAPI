@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Booking } from './entities/booking.entity';
 import { Receipt } from './entities/reciept.entity';
@@ -17,8 +17,8 @@ import { HttpModule } from '@nestjs/axios';
     TypeOrmModule.forFeature([Booking, Receipt, BookingRoom, ExchangeRate]),
     LocationModule,
     RoomModule,
-    UserModule,
-    HotelModule,
+    forwardRef(() => UserModule),
+    forwardRef(() => HotelModule),
     HttpModule,
   ],
   controllers: [BookingController],

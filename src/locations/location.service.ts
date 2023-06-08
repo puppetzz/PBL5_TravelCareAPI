@@ -15,7 +15,7 @@ import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { PropertyAmenity } from 'src/hotels/entities/property-amenity.entity';
 import { HotelStyle } from 'src/hotels/entities/hotel-style.entity';
 import { PaginationResponse } from 'src/ultils/paginationResponse';
-import { Pagination } from 'nestjs-typeorm-paginate';
+
 @Injectable()
 export class LocationService {
   constructor(
@@ -25,8 +25,6 @@ export class LocationService {
     private addressRepository: Repository<Address>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
     @InjectRepository(LocationImage)
     private locationImageRepository: Repository<LocationImage>,
     @InjectRepository(Hotel)
