@@ -62,7 +62,8 @@ export class HotelService {
       .leftJoinAndSelect('rooms.roomFeatures', 'roomFeatures')
       .leftJoinAndSelect('rooms.roomTypes', 'roomTypes')
       .orderBy('location.rating', 'DESC')
-      .orderBy('location.reviewCount', 'DESC');
+      .orderBy('location.reviewCount', 'DESC')
+      .where(`hotel.isRegistered = TRUE`);
 
     if (filterDto.search) {
       const searchLower = filterDto.search.toLowerCase();
@@ -81,7 +82,12 @@ export class HotelService {
     }
 
     const [data, totalCount] = await hotels.getManyAndCount();
-    const total = await this.hotelRepository.count();
+
+    const total = await this.hotelRepository.count({
+      where: {
+        isRegistered: true,
+      },
+    });
     const totalPage = Math.ceil(total / limit);
 
     const pagination: PaginationResponse = {
