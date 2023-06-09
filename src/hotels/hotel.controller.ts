@@ -4,16 +4,13 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Inject,
   Param,
   Patch,
   Post,
   Query,
   UnauthorizedException,
   UseGuards,
-  UsePipes,
   ValidationPipe,
-  forwardRef,
 } from '@nestjs/common';
 import { HotelService } from './hotel.service';
 import { RoomService } from 'src/rooms/room.service';
@@ -24,9 +21,9 @@ import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { Hotel } from './entities/hotel.entity';
-import { PaginationDto } from './dto/pagination.dto';
-import { defaultPage, defaultLimit } from '../constant/constant';
-import { PaginationResponse } from 'src/ultils/paginationResponse';
+import { FilterDto } from './dto/filter.dto';
+import { HotelResponse } from './types/response-hotel.type';
+import { FilterRoomDto } from 'src/rooms/dto/filter-room.dto';
 
 @Controller('hotels')
 @ApiTags('Hotel')
@@ -52,18 +49,20 @@ export class HotelController {
   @Get('/:hotelId/rooms')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'get rooms of hotel' })
-  async getRoomsOfHotel(@Param('hotelId') hotelId: string): Promise<Room[]> {
-    return this.roomService.getRoomsByHotelId(hotelId);
+  async getRoomsOfHotel(
+    @Param('hotelId') hotelId: string,
+    @Query(ValidationPipe) filterRoomDto: FilterRoomDto,
+  ): Promise<Room[]> {
+    return this.roomService.getRoomsByHotelId(hotelId, filterRoomDto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all hotels' })
   async getAllhotels(
-    @Query(ValidationPipe) paginationDto: PaginationDto,
-  ): Promise<{ data: Hotel[]; pagination: PaginationResponse }> {
-    const { page = defaultPage, limit = defaultLimit } = paginationDto;
-    return this.hotelService.getAllHotels({ page, limit });
+    @Query(ValidationPipe) filterDto: FilterDto,
+  ): Promise<HotelResponse> {
+    return this.hotelService.getAllHotels(filterDto);
   }
 
   @Get('/:hotelId')
