@@ -23,6 +23,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Hotel } from './entities/hotel.entity';
 import { FilterDto } from './dto/filter.dto';
 import { HotelResponse } from './types/response-hotel.type';
+import { FilterRoomDto } from 'src/rooms/dto/filter-room.dto';
 
 @Controller('hotels')
 @ApiTags('Hotel')
@@ -48,8 +49,11 @@ export class HotelController {
   @Get('/:hotelId/rooms')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'get rooms of hotel' })
-  async getRoomsOfHotel(@Param('hotelId') hotelId: string): Promise<Room[]> {
-    return this.roomService.getRoomsByHotelId(hotelId);
+  async getRoomsOfHotel(
+    @Param('hotelId') hotelId: string,
+    @Query(ValidationPipe) filterRoomDto: FilterRoomDto,
+  ): Promise<Room[]> {
+    return this.roomService.getRoomsByHotelId(hotelId, filterRoomDto);
   }
 
   @Get()

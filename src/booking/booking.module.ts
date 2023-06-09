@@ -16,7 +16,7 @@ import { HttpModule } from '@nestjs/axios';
   imports: [
     TypeOrmModule.forFeature([Booking, Receipt, BookingRoom, ExchangeRate]),
     LocationModule,
-    RoomModule,
+    forwardRef(() => RoomModule),
     forwardRef(() => UserModule),
     forwardRef(() => HotelModule),
     HttpModule,

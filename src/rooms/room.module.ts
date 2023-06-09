@@ -15,6 +15,7 @@ import { RoomImage } from './entities/room-image.entity';
 import { S3Module } from 'src/aws-s3/s3.module';
 import { Bed } from './entities/bed.entity';
 import { RoomBed } from './entities/room-bed.entity';
+import { BookingModule } from 'src/booking/booking.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RoomBed } from './entities/room-bed.entity';
     RoomTypeModule,
     S3Module,
     forwardRef(() => HotelModule),
+    forwardRef(() => BookingModule),
   ],
   controllers: [RoomController],
   providers: [RoomService],
