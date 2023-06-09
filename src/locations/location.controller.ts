@@ -7,10 +7,12 @@ import {
   HttpStatus,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
   UnauthorizedException,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -18,8 +20,11 @@ import {
 } from '@nestjs/common';
 import { LocationService } from './location.service';
 import {
+  ApiBody,
   ApiConsumes,
+  ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -30,7 +35,10 @@ import { CreateLocationDTO } from './dto/createLocationDTO';
 import { User } from 'src/user/entities/user.entity';
 import { GetCurrentAccount } from 'src/auth/decorators/get-current-account.decorator';
 import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 import { FilesToBodyInterceptor } from './api-file.decorator';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
 import { WishlistService } from 'src/wishlists/wishList.service';
@@ -97,6 +105,51 @@ export class LocationController {
       throw new UnauthorizedException('User not Administrator');
     }
     return this.locationService.deleteLocation(id);
+  }
+
+  @Patch('upload-location-image/:locationId')
+  @ApiParam({ name: 'locationId', type: String })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        images: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @ApiSecurity('JWT-auth')
+  @ApiOkResponse({ type: Location })
+  @UseGuards(AccessTokenGuard)
+  @UseInterceptors(AnyFilesInterceptor())
+  async uploadLocationImage(
+    @GetCurrentAccount() user: User,
+    @Param('locationId', new ParseUUIDPipe()) locationId: string,
+    @UploadedFiles() images: Array<Express.Multer.File>,
+  ) {
+    return this.locationService.uploadLocationimage(user, locationId, images);
+  }
+
+  @Delete('delete-location-image/:locationId/:locationImageId')
+  @ApiOkResponse({ type: String })
+  @ApiSecurity('JWT-auth')
+  @UseGuards(AccessTokenGuard)
+  async deleteLocationImage(
+    @GetCurrentAccount() user: User,
+    @Param('locationId', new ParseUUIDPipe()) locationId: string,
+    @Param('locationImageId', new ParseUUIDPipe()) locationImageId: string,
+  ) {
+    return this.locationService.deleteLocationImage(
+      user,
+      locationId,
+      locationImageId,
+    );
   }
 
   @Post('/:locationId/WishList')
