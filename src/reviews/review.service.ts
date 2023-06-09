@@ -88,6 +88,7 @@ export class ReviewService {
         },
         reviewImages: true,
         tripType: true,
+        location: true,
       },
       select: {
         user: {
@@ -155,9 +156,6 @@ export class ReviewService {
             id: true,
             streetAddress: true,
           },
-        },
-        location: {
-          id: true,
         },
       },
     });

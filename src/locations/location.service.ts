@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Location } from './entities/location.entity';
@@ -375,6 +379,88 @@ export class LocationService {
     });
     return data;
   }
+
+  async uploadLocationimage(
+    user: User,
+    locationId: string,
+    images: Express.Multer.File[],
+  ) {
+    const location = await this.locationRepository.findOne({
+      where: {
+        id: locationId,
+      },
+      relations: {
+        user: true,
+      },
+    });
+
+    if (user.accountId !== location.user.accountId)
+      if (!(await this.checkRoleAdmin(user)))
+        throw new BadRequestException(
+          'You must be owner or admin to upload image for location',
+        );
+
+    if (!location) throw new BadRequestException('Location is not exist!');
+
+    for (const image of images) {
+      const { key, url } = await this.s3Service.uploadImage(image);
+
+      const locationImage = this.locationImageRepository.create({
+        imageKey: key,
+        imageUrl: url,
+        location: location,
+      });
+
+      await this.locationImageRepository.save(locationImage);
+    }
+
+    return await this.getLocationById(locationId);
+  }
+
+  async deleteLocationImage(
+    user: User,
+    locationId: string,
+    locationImageId: string,
+  ) {
+    const location = await this.locationRepository.findOne({
+      where: {
+        id: locationId,
+        locationImages: {
+          id: locationImageId,
+        },
+      },
+      relations: {
+        user: true,
+      },
+    });
+
+    if (user.accountId !== location.user.accountId)
+      if (!(await this.checkRoleAdmin(user)))
+        throw new BadRequestException(
+          'You must be owner or admin to delete image of location',
+        );
+
+    if (!location) throw new BadRequestException('Image is not in location');
+
+    const locationImage = await this.locationImageRepository.findOneBy({
+      id: locationImageId,
+    });
+
+    if (!locationImage)
+      throw new BadRequestException('Location Image not exist!');
+
+    await this.s3Service.deleteImage(locationImage.imageKey);
+
+    const affectedResult = await this.locationImageRepository.delete({
+      id: locationImageId,
+    });
+
+    if (affectedResult.affected > 0) {
+      return 'Delete successfully!';
+    }
+    return 'No delete effected!';
+  }
+
   async deleteLocation(id: string): Promise<void> {
     await this.locationRepository.delete(id);
   }
