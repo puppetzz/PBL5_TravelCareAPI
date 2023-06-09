@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Paypal } from './entities/paypal.entity';
 import { PaypalController } from './paypal.controller';
@@ -12,7 +12,7 @@ import { ExchangeRate } from './entities/exchange-rate.entity';
   imports: [
     TypeOrmModule.forFeature([Paypal, ExchangeRate]),
     HttpModule,
-    BookingModule,
+    forwardRef(() => BookingModule),
   ],
   controllers: [PaypalController],
   providers: [PaypalService, CurrencyExchangeService],
