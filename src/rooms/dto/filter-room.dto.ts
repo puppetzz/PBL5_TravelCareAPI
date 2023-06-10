@@ -8,7 +8,7 @@ export class FilterRoomDto {
 
   @IsOptional()
   @ApiProperty({ required: false })
-  checkout: string;
+  checkOut: string;
 
   @IsOptional()
   @ApiProperty({ required: false })

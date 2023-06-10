@@ -230,11 +230,11 @@ export class RoomService {
 
     if (
       filterRoomDto.checkIn &&
-      filterRoomDto.checkout &&
+      filterRoomDto.checkOut &&
       filterRoomDto.numberOfRooms
     ) {
       const checkIn = new Date(filterRoomDto.checkIn);
-      const checkOut = new Date(filterRoomDto.checkout);
+      const checkOut = new Date(filterRoomDto.checkOut);
 
       const res = [];
 

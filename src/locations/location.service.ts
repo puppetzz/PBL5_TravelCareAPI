@@ -45,7 +45,7 @@ export class LocationService {
     filterDTO: FilterDto,
   ): Promise<{ data: Location[]; pagination: PaginationResponse }> {
     const { search, page, limit } = filterDTO;
-    const locations = await this.locationRepository
+    const locations = this.locationRepository
       .createQueryBuilder('location')
       .leftJoinAndSelect('location.reviews', 'review')
       .leftJoinAndSelect('location.locationImages', 'locationImage')
@@ -60,7 +60,11 @@ export class LocationService {
       .leftJoinAndSelect('address.district', 'district')
       .leftJoinAndSelect('address.ward', 'ward')
       .addOrderBy('location.rating', 'DESC')
-      .addOrderBy('location.reviewCount', 'DESC');
+      .addOrderBy('location.reviewCount', 'DESC')
+      .where(
+        '(hotel.isRegistered = TRUE AND hotel.id IS NOT NULL) OR (hotel.id IS NULL)',
+      );
+
     if (search) {
       const searchLower = search.toLowerCase();
       locations.where(
