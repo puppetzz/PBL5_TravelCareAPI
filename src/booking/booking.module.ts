@@ -9,17 +9,16 @@ import { RoomModule } from 'src/rooms/room.module';
 import { UserModule } from 'src/user/user.module';
 import { HotelModule } from 'src/hotels/hotels.module';
 import { BookingRoom } from './entities/booking-room.entity';
-import { ExchangeRate } from 'src/paypal/entities/exchange-rate.entity';
-import { HttpModule } from '@nestjs/axios';
+import { PaypalModule } from 'src/paypal/paypal.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Booking, Receipt, BookingRoom, ExchangeRate]),
+    TypeOrmModule.forFeature([Booking, Receipt, BookingRoom]),
     LocationModule,
+    forwardRef(() => PaypalModule),
     forwardRef(() => RoomModule),
     forwardRef(() => UserModule),
     forwardRef(() => HotelModule),
-    HttpModule,
   ],
   controllers: [BookingController],
   providers: [BookingService],

@@ -1,5 +1,11 @@
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  HttpException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { catchError, firstValueFrom } from 'rxjs';
 import { BookingService } from 'src/booking/booking.service';
@@ -20,6 +26,7 @@ export class PaypalService {
   constructor(
     private readonly httpService: HttpService,
     private readonly currencyExchangeService: CurrencyExchangeService,
+    @Inject(forwardRef(() => BookingService))
     private readonly bookingService: BookingService,
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
@@ -138,6 +145,7 @@ export class PaypalService {
             },
           },
         },
+        paypal: true,
       },
       select: {
         user: {
@@ -157,13 +165,26 @@ export class PaypalService {
     return newBooking;
   }
 
-  async refundPayment(captureId: string) {
+  async refundPayment(captureId: string, amount: number | null) {
     const accessToken = await this.generateAccessToken();
+    let refundAmount: number = amount;
+
+    if (amount === null) {
+      const captureDetails = await this.getCapturedPaymentDetails(captureId);
+      refundAmount = parseFloat(captureDetails.amount.value);
+      console.log(captureDetails.amount.value);
+    }
+
     const { data } = await firstValueFrom(
       this.httpService
         .post(
           `${this.baseURL.sandbox}/v2/payments/captures/${captureId}/refund`,
-          null,
+          JSON.stringify({
+            amount: {
+              value: refundAmount.toFixed(2),
+              currency_code: 'USD',
+            },
+          }),
           {
             headers: {
               'Content-Type': 'application/json',
