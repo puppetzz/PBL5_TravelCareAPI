@@ -131,27 +131,27 @@ export class HotelService {
   }
 
   async getHotelById(id: string): Promise<Hotel> {
-    const hotel = this.hotelRepository
-      .createQueryBuilder('hotel')
-      .leftJoinAndSelect('hotel.location', 'location')
-      .leftJoinAndSelect('location.locationImages', 'locationImages')
-      .leftJoinAndSelect('location.reviews', 'reviews')
-      .leftJoinAndSelect('reviews.reviewImages', 'reviewImages')
-      .leftJoinAndSelect('location.categories', 'categories')
-      .leftJoinAndSelect('location.address', 'address')
-      .leftJoinAndSelect('address.country', 'country')
-      .leftJoinAndSelect('address.province', 'province')
-      .leftJoinAndSelect('address.district', 'district')
-      .leftJoinAndSelect('address.ward', 'ward')
-      .leftJoinAndSelect('hotel.hotelStyles', 'hotelStyles')
-      .leftJoinAndSelect('hotel.propertyAmenities', 'propertyAmenities')
-      .leftJoinAndSelect('hotel.languages', 'languages')
-      .leftJoinAndSelect('hotel.rooms', 'rooms')
-      .leftJoinAndSelect('rooms.roomFeatures', 'roomFeatures')
-      .leftJoinAndSelect('rooms.roomTypes', 'roomTypes')
-      .where('hotel.id = :id', { id })
-      .getOne();
-    return hotel;
+    return this.hotelRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        location: {
+          locationImages: true,
+          categories: true,
+          address: {
+            country: true,
+            province: true,
+            district: true,
+            ward: true,
+          },
+          hotel: false,
+        },
+        rooms: true,
+        hotelStyles: true,
+        propertyAmenities: true,
+      },
+    });
   }
 
   async getHotelsForOwner(user: User): Promise<Hotel[]> {
