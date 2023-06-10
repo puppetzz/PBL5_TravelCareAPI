@@ -245,6 +245,8 @@ export class RoomService {
           checkOut,
         );
 
+        room.availableRooms = availableRooms;
+
         if (availableRooms >= filterRoomDto.numberOfRooms) {
           res.push(room);
         }

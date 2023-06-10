@@ -48,7 +48,7 @@ export class BookingController {
     return this.bookingService.createBooking(user, bookingDto, false);
   }
 
-  @Delete()
+  @Delete('/:bookingId')
   @ApiSecurity('JWT-auth')
   @ApiOkResponse({ type: String })
   @UseGuards(AccessTokenGuard)
