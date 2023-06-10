@@ -37,6 +37,8 @@ export class LocationService {
     private propertyAmenityRepository: Repository<PropertyAmenity>,
     @InjectRepository(HotelStyle)
     private hotelStyleRepository: Repository<HotelStyle>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly s3Service: S3Service,
     private readonly addressService: AddressService,
   ) {}
@@ -125,7 +127,7 @@ export class LocationService {
       id: In(categoriesArray),
     });
 
-    const newLocation = await this.locationRepository.create({
+    const newLocation = this.locationRepository.create({
       address: newAddress,
       about,
       description,
@@ -138,7 +140,7 @@ export class LocationService {
     if (images) {
       for (const image of images) {
         const { key, url } = await this.s3Service.uploadImage(image);
-        const locationImage = await this.locationImageRepository.create({
+        const locationImage = this.locationImageRepository.create({
           imageKey: key,
           imageUrl: url,
           location: newLocation,
@@ -148,7 +150,7 @@ export class LocationService {
     }
 
     if (isHotel === true) {
-      const newHotel = await this.hotelRepository.create({
+      const newHotel = this.hotelRepository.create({
         phoneNumber,
         email,
         website,
@@ -170,7 +172,11 @@ export class LocationService {
         });
         newHotel.propertyAmenities = properties;
       }
+
+      user.isSale = true;
+
       await this.hotelRepository.save(newHotel);
+      await this.userRepository.save(user);
     }
 
     const resultLocation = await this.locationRepository.findOne({

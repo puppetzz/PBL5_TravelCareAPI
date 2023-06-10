@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { LocationController } from './location.controller';
 import { LocationService } from './location.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,6 +13,7 @@ import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { HotelStyle } from 'src/hotels/entities/hotel-style.entity';
 import { PropertyAmenity } from 'src/hotels/entities/property-amenity.entity';
 import { WishlistModule } from 'src/wishlists/wishList.module';
+import { UserModule } from 'src/user/user.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -28,6 +29,7 @@ import { WishlistModule } from 'src/wishlists/wishList.module';
     AddressModule,
     S3Module,
     WishlistModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [LocationController],
   providers: [LocationService],
