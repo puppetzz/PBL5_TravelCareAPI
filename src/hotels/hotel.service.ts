@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -34,6 +35,9 @@ export class HotelService {
         },
       },
     });
+    if (!hotel) {
+      throw new NotFoundException('Hotel not found');
+    }
 
     if (hotel.location.user.accountId === user.accountId) {
       return true;
@@ -194,5 +198,11 @@ export class HotelService {
     hotel.isRegistered = true;
     await this.hotelRepository.save(hotel);
     return await this.getHotelById(hotelId);
+  }
+  async deleteHotel(hotelId: string, user: User): Promise<void> {
+    if (!(await this.checkIfOwner(hotelId, user))) {
+      throw new UnauthorizedException(`user not owner of ${hotelId}`);
+    }
+    await this.hotelRepository.delete(hotelId);
   }
 }
