@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThanOrEqual, MoreThanOrEqual, Raw, Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Booking } from './entities/booking.entity';
 import { User } from 'src/user/entities/user.entity';
 import { MoreThan } from 'typeorm/find-options/operator/MoreThan';
@@ -14,6 +14,7 @@ import { BookingDto } from './dto/booking.dto';
 import { BookingRoom } from './entities/booking-room.entity';
 import { PaypalService } from 'src/paypal/paypal.service';
 import { CurrencyExchangeService } from 'src/paypal/currency-exchange.service';
+import { Hotel } from 'src/hotels/entities/hotel.entity';
 
 @Injectable()
 export class BookingService {
@@ -24,6 +25,8 @@ export class BookingService {
     private readonly roomRepository: Repository<Room>,
     @InjectRepository(BookingRoom)
     private readonly BookingRoomRepository: Repository<BookingRoom>,
+    @InjectRepository(Hotel)
+    private readonly hotelRepository: Repository<Hotel>,
     @Inject(forwardRef(() => PaypalService))
     private readonly paypalService: PaypalService,
     private readonly currencyExchangeService: CurrencyExchangeService,
@@ -313,6 +316,99 @@ export class BookingService {
     }
 
     return dayCount;
+  }
+
+  async getBookingbyHotel(user: User, hotelId: string) {
+    if (!user.isSale)
+      throw new BadRequestException('User must be a hotel owner');
+
+    const hotel = await this.hotelRepository.findOne({
+      where: {
+        id: hotelId,
+      },
+      relations: {
+        location: {
+          user: true,
+        },
+      },
+    });
+
+    if (!hotel) throw new BadRequestException('Hotel is not exist!');
+
+    if (hotel.location.user.accountId != user.accountId)
+      throw new BadRequestException('You must be owner of hotel');
+
+    const bookings = await this.bookingRepository.find({
+      where: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              id: hotelId,
+            },
+          },
+        },
+      },
+      relations: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              location: {
+                address: {
+                  country: true,
+                  province: true,
+                  district: true,
+                  ward: true,
+                },
+                locationImages: true,
+              },
+            },
+            roomImages: true,
+          },
+        },
+        user: true,
+      },
+    });
+
+    return bookings;
+  }
+
+  async getBookingOfOwnerHotel(user: User) {
+    const bookings = this.bookingRepository.find({
+      where: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              location: {
+                user: {
+                  accountId: user.accountId,
+                },
+              },
+            },
+          },
+        },
+      },
+      relations: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              location: {
+                address: {
+                  country: true,
+                  province: true,
+                  district: true,
+                  ward: true,
+                },
+                locationImages: true,
+              },
+            },
+            roomImages: true,
+          },
+        },
+        user: true,
+      },
+    });
+
+    return bookings;
   }
 
   async getAvailablesRoom(roomId: string, checkIn: Date, checkOut: Date) {
