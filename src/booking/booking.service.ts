@@ -368,6 +368,8 @@ export class BookingService {
       },
     });
 
+    console.log(bookings);
+
     if (!bookings) return room.numberOfRooms;
 
     const unavailableRooms = bookings.reduce(
