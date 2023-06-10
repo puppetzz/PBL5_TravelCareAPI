@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -81,5 +82,16 @@ export class HotelController {
     @GetCurrentAccount() user: User,
   ): Promise<Hotel> {
     return this.hotelService.registerHotelForOwner(user, id);
+  }
+  @Delete('/:hotelId')
+  @UseGuards(AccessTokenGuard)
+  @ApiSecurity('JWT-auth')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'delete hotel by Owner' })
+  async deleteHotelById(
+    @Param('hotelId') id: string,
+    @GetCurrentAccount() user: User,
+  ): Promise<void> {
+    return this.hotelService.deleteHotel(id, user);
   }
 }
