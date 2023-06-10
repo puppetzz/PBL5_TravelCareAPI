@@ -165,8 +165,6 @@ export class BookingService {
         checkOut,
       );
 
-      console.log(availableRooms);
-
       if (!room) throw new BadRequestException('room does not exist!');
 
       if (availableRooms <= 0)
@@ -357,8 +355,12 @@ export class BookingService {
               id: roomId,
             },
           },
-          checkIn: MoreThanOrEqual(checkIn),
-          checkOut: LessThanOrEqual(checkOut),
+          checkIn: Raw(
+            (alias) => `CAST(${alias} AS DATE) >= '${checkIn.toISOString()}'`,
+          ),
+          checkOut: Raw(
+            (alias) => `CAST(${alias} AS DATE) <= '${checkOut.toISOString()}'`,
+          ),
         },
       ],
       relations: {
@@ -367,8 +369,6 @@ export class BookingService {
         },
       },
     });
-
-    console.log(bookings);
 
     if (!bookings) return room.numberOfRooms;
 
