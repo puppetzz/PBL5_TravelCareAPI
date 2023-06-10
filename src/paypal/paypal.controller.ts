@@ -34,7 +34,7 @@ export class PaypalController {
 
   @Post('refund-captured-payment/:captureId')
   async refundCapture(@Param('captureId') captureId: string) {
-    return this.paypalService.refundPayment(captureId);
+    return this.paypalService.refundPayment(captureId, null);
   }
 
   @Get('get/:captureId')

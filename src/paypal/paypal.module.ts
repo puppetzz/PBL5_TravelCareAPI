@@ -11,11 +11,15 @@ import { ExchangeRate } from './entities/exchange-rate.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Paypal, ExchangeRate]),
-    HttpModule,
+    forwardRef(() => HttpModule),
     forwardRef(() => BookingModule),
   ],
   controllers: [PaypalController],
   providers: [PaypalService, CurrencyExchangeService],
-  exports: [TypeOrmModule.forFeature([Paypal]), PaypalService],
+  exports: [
+    TypeOrmModule.forFeature([Paypal, ExchangeRate]),
+    PaypalService,
+    CurrencyExchangeService,
+  ],
 })
 export class PaypalModule {}

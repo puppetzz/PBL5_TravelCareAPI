@@ -58,4 +58,10 @@ export class BookingController {
   ) {
     return this.bookingService.cancelBooking(user, bookingId);
   }
+
+  // @Get('test/test/date')
+  // test() {
+  //   const date = new Date('2023-06-10');
+  //   return this.bookingService.getEndFreeCancelDate(date, 2);
+  // }
 }
