@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Location } from './entities/location.entity';
@@ -15,7 +19,7 @@ import { Hotel } from 'src/hotels/entities/hotel.entity';
 import { PropertyAmenity } from 'src/hotels/entities/property-amenity.entity';
 import { HotelStyle } from 'src/hotels/entities/hotel-style.entity';
 import { PaginationResponse } from 'src/ultils/paginationResponse';
-import { Pagination } from 'nestjs-typeorm-paginate';
+
 @Injectable()
 export class LocationService {
   constructor(
@@ -25,8 +29,6 @@ export class LocationService {
     private addressRepository: Repository<Address>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
     @InjectRepository(LocationImage)
     private locationImageRepository: Repository<LocationImage>,
     @InjectRepository(Hotel)
@@ -35,15 +37,18 @@ export class LocationService {
     private propertyAmenityRepository: Repository<PropertyAmenity>,
     @InjectRepository(HotelStyle)
     private hotelStyleRepository: Repository<HotelStyle>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly s3Service: S3Service,
     private readonly addressService: AddressService,
   ) {}
 
   async getLocations(
+    user: User,
     filterDTO: FilterDto,
   ): Promise<{ data: Location[]; pagination: PaginationResponse }> {
     const { search, page, limit } = filterDTO;
-    const locations = await this.locationRepository
+    const locations = this.locationRepository
       .createQueryBuilder('location')
       .leftJoinAndSelect('location.reviews', 'review')
       .leftJoinAndSelect('location.locationImages', 'locationImage')
@@ -57,8 +62,20 @@ export class LocationService {
       .leftJoinAndSelect('address.province', 'province')
       .leftJoinAndSelect('address.district', 'district')
       .leftJoinAndSelect('address.ward', 'ward')
-      .addOrderBy('location.rating', 'DESC')
-      .addOrderBy('location.reviewCount', 'DESC');
+      .addOrderBy('location.reviewCount', 'DESC')
+      .where(
+        '(hotel.isRegistered = TRUE AND hotel.id IS NOT NULL) OR (hotel.id IS NULL)',
+      );
+
+    if (user) {
+      locations.leftJoinAndSelect(
+        'location.wishList',
+        'wishList',
+        'wishList.userAccountId = :accountId',
+        { accountId: user.accountId },
+      );
+    }
+
     if (search) {
       const searchLower = search.toLowerCase();
       locations.where(
@@ -70,6 +87,21 @@ export class LocationService {
       locations.take(limit).skip((page - 1) * limit);
     }
     const [data, totalCount] = await locations.getManyAndCount();
+    data.sort((a, b) => {
+      // Replace the logic below with your actual rating calculation for each location
+      const ratingA = a.rating;
+      const ratingB = b.rating;
+
+      // Sort in descending order
+      if (ratingA > ratingB) {
+        return -1;
+      } else if (ratingA < ratingB) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
     const total = await this.locationRepository.count();
     const totalPage = Math.ceil(total / limit);
 
@@ -119,7 +151,7 @@ export class LocationService {
       id: In(categoriesArray),
     });
 
-    const newLocation = await this.locationRepository.create({
+    const newLocation = this.locationRepository.create({
       address: newAddress,
       about,
       description,
@@ -132,7 +164,7 @@ export class LocationService {
     if (images) {
       for (const image of images) {
         const { key, url } = await this.s3Service.uploadImage(image);
-        const locationImage = await this.locationImageRepository.create({
+        const locationImage = this.locationImageRepository.create({
           imageKey: key,
           imageUrl: url,
           location: newLocation,
@@ -142,7 +174,7 @@ export class LocationService {
     }
 
     if (isHotel === true) {
-      const newHotel = await this.hotelRepository.create({
+      const newHotel = this.hotelRepository.create({
         phoneNumber,
         email,
         website,
@@ -164,7 +196,11 @@ export class LocationService {
         });
         newHotel.propertyAmenities = properties;
       }
+
+      user.isSale = true;
+
       await this.hotelRepository.save(newHotel);
+      await this.userRepository.save(user);
     }
 
     const resultLocation = await this.locationRepository.findOne({
@@ -352,31 +388,116 @@ export class LocationService {
 
     return result;
   }
-  async getLocationById(id: string): Promise<Location> {
-    const data = await this.locationRepository.findOne({
+  async getLocationById(id: string, user: User = null): Promise<Location> {
+    const location = this.locationRepository
+      .createQueryBuilder('location')
+      .leftJoinAndSelect('location.reviews', 'review')
+      .leftJoinAndSelect('location.locationImages', 'locationImage')
+      .leftJoinAndSelect('review.reviewImages', 'review-image')
+      .leftJoinAndSelect('location.categories', 'category')
+      .leftJoinAndSelect('location.hotel', 'hotel')
+      .leftJoinAndSelect('hotel.hotelStyles', 'hotelStyles')
+      .leftJoinAndSelect('hotel.propertyAmenities', 'propertyAmenities')
+      .leftJoinAndSelect('location.address', 'address')
+      .leftJoinAndSelect('address.country', 'country')
+      .leftJoinAndSelect('address.province', 'province')
+      .leftJoinAndSelect('address.district', 'district')
+      .leftJoinAndSelect('address.ward', 'ward')
+      .where('location.id = :id', { id });
+
+    if (user) {
+      location.leftJoinAndSelect(
+        'location.wishList',
+        'wishList',
+        'wishList.userAccountId = :accountId',
+        { accountId: user.accountId },
+      );
+    }
+
+    return location.getOne();
+  }
+
+  async uploadLocationimage(
+    user: User,
+    locationId: string,
+    images: Express.Multer.File[],
+  ) {
+    const location = await this.locationRepository.findOne({
       where: {
-        id: id,
+        id: locationId,
       },
       relations: {
-        address: {
-          country: true,
-          province: true,
-          district: true,
-          ward: true,
-        },
-        categories: true,
-        locationImages: true,
-        hotel: {
-          hotelStyles: true,
-          propertyAmenities: true,
-        },
-        reviews: {
-          reviewImages: true,
-        },
+        user: true,
       },
     });
-    return data;
+
+    if (user.accountId !== location.user.accountId)
+      if (!(await this.checkRoleAdmin(user)))
+        throw new BadRequestException(
+          'You must be owner or admin to upload image for location',
+        );
+
+    if (!location) throw new BadRequestException('Location is not exist!');
+
+    for (const image of images) {
+      const { key, url } = await this.s3Service.uploadImage(image);
+
+      const locationImage = this.locationImageRepository.create({
+        imageKey: key,
+        imageUrl: url,
+        location: location,
+      });
+
+      await this.locationImageRepository.save(locationImage);
+    }
+
+    return await this.getLocationById(locationId);
   }
+
+  async deleteLocationImage(
+    user: User,
+    locationId: string,
+    locationImageId: string,
+  ) {
+    const location = await this.locationRepository.findOne({
+      where: {
+        id: locationId,
+        locationImages: {
+          id: locationImageId,
+        },
+      },
+      relations: {
+        user: true,
+      },
+    });
+
+    if (user.accountId !== location.user.accountId)
+      if (!(await this.checkRoleAdmin(user)))
+        throw new BadRequestException(
+          'You must be owner or admin to delete image of location',
+        );
+
+    if (!location) throw new BadRequestException('Image is not in location');
+
+    const locationImage = await this.locationImageRepository.findOneBy({
+      id: locationImageId,
+    });
+
+    if (!locationImage)
+      throw new BadRequestException('Location Image not exist!');
+
+    await this.s3Service.deleteImage(locationImage.imageKey);
+
+    const affectedResult = await this.locationImageRepository.delete({
+      id: locationImageId,
+    });
+
+    if (affectedResult.affected > 0) {
+      return 'Delete successfully!';
+    }
+    return 'No delete effected!';
+  }
+
   async deleteLocation(id: string): Promise<void> {
     await this.locationRepository.delete(id);
   }

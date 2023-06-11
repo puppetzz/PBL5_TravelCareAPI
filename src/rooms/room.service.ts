@@ -7,7 +7,7 @@ import { Room } from './entities/room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoomDto } from './dto/room.dto';
 import { Hotel } from 'src/hotels/entities/hotel.entity';
-import { In, Repository } from 'typeorm';
+import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { Discount } from './entities/discount.entity';
 import { RoomFeature } from './entities/room-feature.entity';
 import { RoomType } from './entities/room-type.entity';
@@ -17,6 +17,8 @@ import { RoomImage } from './entities/room-image.entity';
 import { S3Service } from 'src/aws-s3/s3.service';
 import { Bed } from './entities/bed.entity';
 import { RoomBed } from './entities/room-bed.entity';
+import { BookingService } from 'src/booking/booking.service';
+import { FilterRoomDto } from './dto/filter-room.dto';
 
 @Injectable()
 export class RoomService {
@@ -39,6 +41,7 @@ export class RoomService {
     private roomBedRepository: Repository<RoomBed>,
     private readonly hotelService: HotelService,
     private readonly s3Service: S3Service,
+    private readonly bookingService: BookingService,
   ) {}
   async createRoom(hotelId: string, createRoomDto: RoomDto): Promise<Room> {
     const hotelOwner = await this.hotelRepository.findOneBy({ id: hotelId });
@@ -51,18 +54,22 @@ export class RoomService {
       availableRooms,
       sleeps,
       isPrepay,
+      isFreeCancellation,
+      freeCancellationPeriod,
       discountIds,
       roomFeatureIds,
       roomTypeIds,
       roomBeds,
     } = createRoomDto;
-    const createRoom = await this.roomRepository.create({
+    const createRoom = this.roomRepository.create({
       hotel: hotelOwner,
       price,
       availableRooms,
       numberOfRooms,
       sleeps,
       isPrepay,
+      isFreeCancellation,
+      freeCancellationPeriod,
     });
     if (discountIds) {
       const discountEntities = await this.discountRepository.findBy({
@@ -92,7 +99,7 @@ export class RoomService {
         if (!bed) {
           throw new NotFoundException(`Bed ${roomBed.bedId} does not exist`);
         }
-        const newRoomBed = await this.roomBedRepository.create({
+        const newRoomBed = this.roomBedRepository.create({
           bed: bed,
           numberOfBeds: roomBed.numberOfBed,
           room: newRoom,
@@ -143,6 +150,8 @@ export class RoomService {
       sleeps,
       isPrepay,
       discountIds,
+      isFreeCancellation,
+      freeCancellationPeriod,
       roomFeatureIds,
       roomTypeIds,
       roomBeds,
@@ -152,6 +161,8 @@ export class RoomService {
     room.availableRooms = availableRooms;
     room.sleeps = sleeps;
     room.isPrepay = isPrepay;
+    room.isFreeCancellation = isFreeCancellation;
+    room.freeCancellationPeriod = freeCancellationPeriod;
     if (discountIds) {
       const discountEntities = await this.discountRepository.findBy({
         id: In(discountIds),
@@ -182,7 +193,7 @@ export class RoomService {
         if (!bed) {
           throw new NotFoundException(`Bed ${roomBed.bedId} does not exist`);
         }
-        const newRoomBed = await this.roomBedRepository.create({
+        const newRoomBed = this.roomBedRepository.create({
           bed: bed,
           numberOfBeds: roomBed.numberOfBed,
           room: room,
@@ -193,12 +204,18 @@ export class RoomService {
     }
     return this.getRoomById(roomId);
   }
-  async getRoomsByHotelId(hotelId: string): Promise<Room[]> {
+  async getRoomsByHotelId(
+    hotelId: string,
+    filterRoomDto: FilterRoomDto,
+  ): Promise<Room[]> {
+    const sleeps = filterRoomDto.sleeps ? filterRoomDto.sleeps : 0;
+
     const rooms = await this.roomRepository.find({
       where: {
         hotel: {
           id: hotelId,
         },
+        sleeps: MoreThanOrEqual(sleeps),
       },
       relations: {
         discounts: true,
@@ -210,6 +227,34 @@ export class RoomService {
         },
       },
     });
+
+    if (
+      filterRoomDto.checkIn &&
+      filterRoomDto.checkOut &&
+      filterRoomDto.numberOfRooms
+    ) {
+      const checkIn = new Date(filterRoomDto.checkIn);
+      const checkOut = new Date(filterRoomDto.checkOut);
+
+      const res = [];
+
+      for (const room of rooms) {
+        const availableRooms = await this.bookingService.getAvailablesRoom(
+          room.id,
+          checkIn,
+          checkOut,
+        );
+
+        room.availableRooms = availableRooms;
+
+        if (availableRooms >= filterRoomDto.numberOfRooms) {
+          res.push(room);
+        }
+      }
+
+      return res;
+    }
+
     return rooms;
   }
   async getRoomById(roomId: string): Promise<Room> {
@@ -256,7 +301,7 @@ export class RoomService {
     roomId: string,
     files: Express.Multer.File[],
     user: User,
-  ): Promise<RoomImage[]> {
+  ): Promise<Room> {
     const hotel = await this.hotelRepository.findOne({
       where: {
         rooms: {
@@ -268,7 +313,6 @@ export class RoomService {
       throw new UnauthorizedException('User is not owner of this hotel');
     }
 
-    const resImages = [];
     if (files) {
       const room = await this.roomRepository.findOneBy({
         id: roomId,
@@ -284,9 +328,27 @@ export class RoomService {
           room: room,
         });
         await this.roomImageRepository.save(roomImage);
-        resImages.push(roomImage);
       }
     }
-    return resImages;
+    return this.getRoomById(roomId);
+  }
+  async deleteRoomImage(
+    roomImageId: string,
+    roomId: string,
+    user: User,
+  ): Promise<Room> {
+    const hotel = await this.hotelRepository.findOne({
+      where: {
+        rooms: {
+          id: roomId,
+        },
+      },
+    });
+    if (!(await this.hotelService.checkIfOwner(hotel.id, user))) {
+      throw new UnauthorizedException('User is not owner of this hotel');
+    }
+
+    await this.roomImageRepository.delete(roomImageId);
+    return this.getRoomById(roomId);
   }
 }

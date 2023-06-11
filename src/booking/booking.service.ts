@@ -1,30 +1,35 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThanOrEqual, MoreThanOrEqual, Raw, Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
 import { Booking } from './entities/booking.entity';
 import { User } from 'src/user/entities/user.entity';
 import { MoreThan } from 'typeorm/find-options/operator/MoreThan';
 import { Room } from 'src/rooms/entities/room.entity';
 import { BookingDto } from './dto/booking.dto';
 import { BookingRoom } from './entities/booking-room.entity';
-import { catchError, firstValueFrom } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
+import { PaypalService } from 'src/paypal/paypal.service';
+import { CurrencyExchangeService } from 'src/paypal/currency-exchange.service';
+import { Hotel } from 'src/hotels/entities/hotel.entity';
 
 @Injectable()
 export class BookingService {
-  private readonly baseURL = {
-    sandbox: 'https://api-m.sandbox.paypal.com',
-    production: 'https://api-m.paypal.com',
-  };
-
   constructor(
-    private readonly httpService: HttpService,
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
     @InjectRepository(Room)
     private readonly roomRepository: Repository<Room>,
     @InjectRepository(BookingRoom)
     private readonly BookingRoomRepository: Repository<BookingRoom>,
+    @InjectRepository(Hotel)
+    private readonly hotelRepository: Repository<Hotel>,
+    @Inject(forwardRef(() => PaypalService))
+    private readonly paypalService: PaypalService,
+    private readonly currencyExchangeService: CurrencyExchangeService,
   ) {}
 
   async getBookings(): Promise<Booking[]> {
@@ -55,10 +60,13 @@ export class BookingService {
                   district: true,
                   ward: true,
                 },
+                locationImages: true,
               },
             },
+            roomImages: true,
           },
         },
+        paypal: true,
       },
       select: {
         user: {
@@ -103,10 +111,13 @@ export class BookingService {
                   district: true,
                   ward: true,
                 },
+                locationImages: true,
               },
             },
+            roomImages: true,
           },
         },
+        paypal: true,
       },
       select: {
         user: {
@@ -228,27 +239,60 @@ export class BookingService {
       );
 
     if (booking.isPaid) {
-      const accessToken = await this.generateAccessToken();
-      const { data } = await firstValueFrom(
-        this.httpService
-          .post(
-            `${this.baseURL.sandbox}/v2/payments/captures/${booking.paypal.transactionId}/refund`,
-            null,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-              },
-            },
-          )
-          .pipe(
-            catchError((e) => {
-              throw new HttpException(e.response.data, e.response.status);
-            }),
-          ),
-      );
+      const checkIn = new Date(booking.checkIn);
 
-      if (!data) throw new BadRequestException('Refund failed!');
+      const freeCancellationPeriods = [];
+
+      for (const bookingRoom of booking.bookingRooms) {
+        if (bookingRoom.room.isFreeCancellation) {
+          freeCancellationPeriods.push(bookingRoom.room.freeCancellationPeriod);
+        }
+      }
+
+      if (
+        freeCancellationPeriods.length > 0 &&
+        freeCancellationPeriods.length == booking.bookingRooms.length
+      ) {
+        const freeCancellationPeriod = freeCancellationPeriods.sort(
+          (a, b) => b - a,
+        )[0];
+
+        const endOfFreeCancellation = this.getEndFreeCancelDate(
+          checkIn,
+          freeCancellationPeriod,
+        );
+
+        if (endOfFreeCancellation < new Date()) {
+          const refundAmount =
+            await this.currencyExchangeService.currencyExchange(
+              (booking.totalAmount * booking.cancellationPay) / 100,
+            );
+          const data = await this.paypalService.refundPayment(
+            booking.paypal.transactionId,
+            refundAmount,
+          );
+
+          if (!data) throw new BadRequestException('Refund failed!');
+        } else {
+          const data = await this.paypalService.refundPayment(
+            booking.paypal.transactionId,
+            null,
+          );
+
+          if (!data) throw new BadRequestException('Refund failed!');
+        }
+      } else {
+        const refundAmount =
+          await this.currencyExchangeService.currencyExchange(
+            (booking.totalAmount * booking.cancellationPay) / 100,
+          );
+        const data = await this.paypalService.refundPayment(
+          booking.paypal.transactionId,
+          refundAmount,
+        );
+
+        if (!data) throw new BadRequestException('Refund failed!');
+      }
     }
 
     const deleteResult = await this.bookingRepository.delete({
@@ -272,6 +316,127 @@ export class BookingService {
     }
 
     return dayCount;
+  }
+
+  async getBookingbyHotel(user: User, hotelId: string) {
+    if (!user.isSale)
+      throw new BadRequestException('User must be a hotel owner');
+
+    const hotel = await this.hotelRepository.findOne({
+      where: {
+        id: hotelId,
+      },
+      relations: {
+        location: {
+          user: true,
+        },
+      },
+    });
+
+    if (!hotel) throw new BadRequestException('Hotel is not exist!');
+
+    if (hotel.location.user.accountId != user.accountId)
+      throw new BadRequestException('You must be owner of hotel');
+
+    const bookings = await this.bookingRepository.find({
+      where: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              id: hotelId,
+            },
+          },
+        },
+      },
+      relations: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              location: {
+                address: {
+                  country: true,
+                  province: true,
+                  district: true,
+                  ward: true,
+                },
+                locationImages: true,
+              },
+            },
+            roomImages: true,
+          },
+        },
+        user: true,
+      },
+      select: {
+        user: {
+          accountId: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          profileImageUrl: true,
+          account: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    return bookings;
+  }
+
+  async getBookingOfOwnerHotel(user: User) {
+    const bookings = this.bookingRepository.find({
+      where: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              location: {
+                user: {
+                  accountId: user.accountId,
+                },
+              },
+            },
+          },
+        },
+      },
+      relations: {
+        bookingRooms: {
+          room: {
+            hotel: {
+              location: {
+                address: {
+                  country: true,
+                  province: true,
+                  district: true,
+                  ward: true,
+                },
+                locationImages: true,
+              },
+            },
+            roomImages: true,
+          },
+        },
+        user: true,
+      },
+      select: {
+        user: {
+          accountId: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          profileImageUrl: true,
+          account: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    return bookings;
   }
 
   async getAvailablesRoom(roomId: string, checkIn: Date, checkOut: Date) {
@@ -318,8 +483,12 @@ export class BookingService {
               id: roomId,
             },
           },
-          checkIn: MoreThanOrEqual(checkIn),
-          checkOut: LessThanOrEqual(checkOut),
+          checkIn: Raw(
+            (alias) => `CAST(${alias} AS DATE) >= '${checkIn.toISOString()}'`,
+          ),
+          checkOut: Raw(
+            (alias) => `CAST(${alias} AS DATE) <= '${checkOut.toISOString()}'`,
+          ),
         },
       ],
       relations: {
@@ -343,22 +512,11 @@ export class BookingService {
     return room.numberOfRooms - unavailableRooms;
   }
 
-  private async generateAccessToken() {
-    const auth = Buffer.from(
-      process.env.PAYPAL_cLIENT_ID + ':' + process.env.PAYPAL_APP_SECRET_KEY,
-    ).toString('base64');
+  private getEndFreeCancelDate(checkIn: Date, freeCancellationPeriod: number) {
+    const twentyHoursInMillis = freeCancellationPeriod * 24 * 60 * 60 * 1000;
 
-    const { data } = await firstValueFrom(
-      this.httpService.post(
-        `${this.baseURL.sandbox}/v1/oauth2/token`,
-        'grant_type=client_credentials',
-        {
-          headers: {
-            Authorization: `Basic ${auth}`,
-          },
-        },
-      ),
-    );
-    return data.access_token;
+    const checkInDate = new Date(checkIn);
+
+    return new Date(checkInDate.getTime() - twentyHoursInMillis);
   }
 }

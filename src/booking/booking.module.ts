@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Booking } from './entities/booking.entity';
 import { Receipt } from './entities/reciept.entity';
@@ -9,17 +9,16 @@ import { RoomModule } from 'src/rooms/room.module';
 import { UserModule } from 'src/user/user.module';
 import { HotelModule } from 'src/hotels/hotels.module';
 import { BookingRoom } from './entities/booking-room.entity';
-import { ExchangeRate } from 'src/paypal/entities/exchange-rate.entity';
-import { HttpModule } from '@nestjs/axios';
+import { PaypalModule } from 'src/paypal/paypal.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Booking, Receipt, BookingRoom, ExchangeRate]),
+    TypeOrmModule.forFeature([Booking, Receipt, BookingRoom]),
     LocationModule,
-    RoomModule,
-    UserModule,
-    HotelModule,
-    HttpModule,
+    forwardRef(() => PaypalModule),
+    forwardRef(() => RoomModule),
+    forwardRef(() => UserModule),
+    forwardRef(() => HotelModule),
   ],
   controllers: [BookingController],
   providers: [BookingService],

@@ -48,7 +48,7 @@ export class Room {
 
   @Column({ nullable: true })
   @ApiProperty()
-  freeCancellationPriod: number;
+  freeCancellationPeriod: number;
 
   @OneToMany(() => RoomImage, (roomImage) => roomImage.room)
   @ApiProperty()
@@ -82,9 +82,6 @@ export class Room {
   roomTypes: RoomType[];
 
   @OneToMany(() => RoomBed, (roomBed) => roomBed.room, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-    cascade: true,
     nullable: false,
   })
   roomBeds: RoomBed[];

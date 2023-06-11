@@ -1,16 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 
-export class FilterDto {
+export class FilterRoomDto {
   @IsOptional()
   @ApiProperty({ required: false })
-  search: string;
+  checkIn: string;
 
   @IsOptional()
   @ApiProperty({ required: false })
-  page: number;
+  checkOut: string;
 
   @IsOptional()
   @ApiProperty({ required: false })
-  limit: number;
+  sleeps: number;
+
+  @IsOptional()
+  @ApiProperty({ required: false })
+  numberOfRooms: number;
 }

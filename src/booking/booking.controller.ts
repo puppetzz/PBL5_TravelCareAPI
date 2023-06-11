@@ -48,7 +48,7 @@ export class BookingController {
     return this.bookingService.createBooking(user, bookingDto, false);
   }
 
-  @Delete()
+  @Delete('/:bookingId')
   @ApiSecurity('JWT-auth')
   @ApiOkResponse({ type: String })
   @UseGuards(AccessTokenGuard)
@@ -57,5 +57,24 @@ export class BookingController {
     @Param('bookingId') bookingId: string,
   ) {
     return this.bookingService.cancelBooking(user, bookingId);
+  }
+
+  @Get('/get-by-hotel/:hotelId')
+  @ApiOkResponse({ type: Booking, isArray: true })
+  @ApiSecurity('JWT-auth')
+  @UseGuards(AccessTokenGuard)
+  getBookingByHotelId(
+    @GetCurrentAccount() user: User,
+    @Param('hotelId') hotelId: string,
+  ) {
+    return this.bookingService.getBookingbyHotel(user, hotelId);
+  }
+
+  @Get('get-for-owner-hotel')
+  @ApiOkResponse({ type: Booking, isArray: true })
+  @ApiSecurity('JWT-auth')
+  @UseGuards(AccessTokenGuard)
+  getBookingForOwnerHotel(@GetCurrentAccount() user: User) {
+    return this.bookingService.getBookingOfOwnerHotel(user);
   }
 }

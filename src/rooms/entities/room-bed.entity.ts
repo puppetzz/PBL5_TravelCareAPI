@@ -17,6 +17,10 @@ export class RoomBed {
   })
   bed: Bed;
 
-  @ManyToOne(() => Room, (room) => room.roomBeds)
+  @ManyToOne(() => Room, (room) => room.roomBeds, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    cascade: true,
+  })
   room: Room;
 }
