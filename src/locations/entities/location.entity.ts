@@ -28,8 +28,6 @@ export class Location {
   @ApiProperty()
   name: string;
 
-  @Column({ type: 'decimal', precision: 2, scale: 1, default: 0.0 })
-  @ApiProperty()
   rating: number;
 
   @Column({ nullable: true })
