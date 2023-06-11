@@ -61,7 +61,6 @@ export class LocationService {
       .leftJoinAndSelect('address.province', 'province')
       .leftJoinAndSelect('address.district', 'district')
       .leftJoinAndSelect('address.ward', 'ward')
-      .addOrderBy('location.rating', 'DESC')
       .addOrderBy('location.reviewCount', 'DESC')
       .where(
         '(hotel.isRegistered = TRUE AND hotel.id IS NOT NULL) OR (hotel.id IS NULL)',
@@ -78,6 +77,21 @@ export class LocationService {
       locations.take(limit).skip((page - 1) * limit);
     }
     const [data, totalCount] = await locations.getManyAndCount();
+    data.sort((a, b) => {
+      // Replace the logic below with your actual rating calculation for each location
+      const ratingA = a.rating;
+      const ratingB = b.rating;
+
+      // Sort in descending order
+      if (ratingA > ratingB) {
+        return -1;
+      } else if (ratingA < ratingB) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
     const total = await this.locationRepository.count();
     const totalPage = Math.ceil(total / limit);
 
