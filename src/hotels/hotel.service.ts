@@ -93,7 +93,7 @@ export class HotelService {
       hotels.where(`rooms.sleeps >= ${filterDto.sleeps}`);
     }
 
-    const [data, totalCount] = await hotels.getManyAndCount();
+    const [response, totalCount] = await hotels.getManyAndCount();
 
     const total = await this.hotelRepository.count({
       where: {
@@ -115,7 +115,7 @@ export class HotelService {
 
       const data = [];
 
-      for (const hotel of await hotels.getMany()) {
+      for (const hotel of response) {
         let isValid = false;
 
         for (const room of hotel.rooms) {
@@ -138,6 +138,8 @@ export class HotelService {
 
       return { data, pagination };
     }
+
+    const data = response;
 
     return { data, pagination };
   }
