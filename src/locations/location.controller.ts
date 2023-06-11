@@ -43,6 +43,7 @@ import { FilesToBodyInterceptor } from './api-file.decorator';
 import { UpdateLocationDto } from './dto/updateLocation.dto';
 import { WishlistService } from 'src/wishlists/wishList.service';
 import { PaginationResponse } from 'src/ultils/paginationResponse';
+import { LocationAccess } from 'src/auth/guards/access-location.guard';
 
 @Controller('locations')
 @ApiTags('location')
@@ -54,11 +55,18 @@ export class LocationController {
   ) {}
 
   @Get()
+  @UseGuards(LocationAccess)
+  @ApiSecurity('JWT-auth')
   getLocations(
+    @GetCurrentAccount() user: User,
     @Query(ValidationPipe) filterDto: FilterDto,
   ): Promise<{ data: Location[]; pagination: PaginationResponse }> {
     const { page = defaultPage, limit = defaultLimit } = filterDto;
-    return this.locationService.getLocations({ ...filterDto, page, limit });
+    return this.locationService.getLocations(user, {
+      ...filterDto,
+      page,
+      limit,
+    });
   }
 
   @UseGuards(AccessTokenGuard)
@@ -88,8 +96,13 @@ export class LocationController {
 
   @Get('/:locationId')
   @UsePipes(ValidationPipe)
-  getLocationById(@Param('locationId') locationId: string) {
-    return this.locationService.getLocationById(locationId);
+  @ApiSecurity('JWT-auth')
+  @UseGuards(LocationAccess)
+  getLocationById(
+    @GetCurrentAccount() user: User,
+    @Param('locationId') locationId: string,
+  ) {
+    return this.locationService.getLocationById(locationId, user);
   }
   @Delete('/:locationId')
   @UseGuards(AccessTokenGuard)

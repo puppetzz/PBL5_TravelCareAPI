@@ -45,7 +45,7 @@ export class HotelService {
     return false;
   }
 
-  async getAllHotels(filterDto: FilterDto): Promise<HotelResponse> {
+  async getAllHotels(user: User, filterDto: FilterDto): Promise<HotelResponse> {
     const { page = defaultPage, limit = defaultLimit } = filterDto;
     const hotels = this.hotelRepository
       .createQueryBuilder('hotel')
@@ -68,6 +68,14 @@ export class HotelService {
       .orderBy('location.rating', 'DESC')
       .orderBy('location.reviewCount', 'DESC')
       .where(`hotel.isRegistered = TRUE`);
+
+    if (user)
+      hotels.leftJoinAndSelect(
+        'location.wishList',
+        'wishList',
+        'wishList.userAccountId = :accountId',
+        { accountId: user.accountId },
+      );
 
     if (filterDto.search) {
       const searchLower = filterDto.search.toLowerCase();
@@ -134,7 +142,7 @@ export class HotelService {
     return { data, pagination };
   }
 
-  async getHotelById(id: string): Promise<Hotel> {
+  async getHotelById(id: string, user: User = null): Promise<Hotel> {
     const hotel = this.hotelRepository
       .createQueryBuilder('hotel')
       .leftJoinAndSelect('hotel.location', 'location')
@@ -153,9 +161,17 @@ export class HotelService {
       .leftJoinAndSelect('hotel.rooms', 'rooms')
       .leftJoinAndSelect('rooms.roomFeatures', 'roomFeatures')
       .leftJoinAndSelect('rooms.roomTypes', 'roomTypes')
-      .where('hotel.id = :id', { id })
-      .getOne();
-    return hotel;
+      .where('hotel.id = :id', { id });
+
+    if (user)
+      hotel.leftJoinAndSelect(
+        'location.wishList',
+        'wishList',
+        'wishList.userAccountId = :accountId',
+        { accountId: user.accountId },
+      );
+
+    return hotel.getOne();
   }
 
   async getHotelsForOwner(user: User): Promise<Hotel[]> {
