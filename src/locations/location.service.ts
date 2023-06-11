@@ -44,6 +44,7 @@ export class LocationService {
   ) {}
 
   async getLocations(
+    user: User,
     filterDTO: FilterDto,
   ): Promise<{ data: Location[]; pagination: PaginationResponse }> {
     const { search, page, limit } = filterDTO;
@@ -65,6 +66,15 @@ export class LocationService {
       .where(
         '(hotel.isRegistered = TRUE AND hotel.id IS NOT NULL) OR (hotel.id IS NULL)',
       );
+
+    if (user) {
+      locations.leftJoinAndSelect(
+        'location.wishList',
+        'wishList',
+        'wishList.userAccountId = :accountId',
+        { accountId: user.accountId },
+      );
+    }
 
     if (search) {
       const searchLower = search.toLowerCase();
@@ -378,30 +388,33 @@ export class LocationService {
 
     return result;
   }
-  async getLocationById(id: string): Promise<Location> {
-    const data = await this.locationRepository.findOne({
-      where: {
-        id: id,
-      },
-      relations: {
-        address: {
-          country: true,
-          province: true,
-          district: true,
-          ward: true,
-        },
-        categories: true,
-        locationImages: true,
-        hotel: {
-          hotelStyles: true,
-          propertyAmenities: true,
-        },
-        reviews: {
-          reviewImages: true,
-        },
-      },
-    });
-    return data;
+  async getLocationById(id: string, user: User = null): Promise<Location> {
+    const location = this.locationRepository
+      .createQueryBuilder('location')
+      .leftJoinAndSelect('location.reviews', 'review')
+      .leftJoinAndSelect('location.locationImages', 'locationImage')
+      .leftJoinAndSelect('review.reviewImages', 'review-image')
+      .leftJoinAndSelect('location.categories', 'category')
+      .leftJoinAndSelect('location.hotel', 'hotel')
+      .leftJoinAndSelect('hotel.hotelStyles', 'hotelStyles')
+      .leftJoinAndSelect('hotel.propertyAmenities', 'propertyAmenities')
+      .leftJoinAndSelect('location.address', 'address')
+      .leftJoinAndSelect('address.country', 'country')
+      .leftJoinAndSelect('address.province', 'province')
+      .leftJoinAndSelect('address.district', 'district')
+      .leftJoinAndSelect('address.ward', 'ward')
+      .where('location.id = :id', { id });
+
+    if (user) {
+      location.leftJoinAndSelect(
+        'location.wishList',
+        'wishList',
+        'wishList.userAccountId = :accountId',
+        { accountId: user.accountId },
+      );
+    }
+
+    return location.getOne();
   }
 
   async uploadLocationimage(

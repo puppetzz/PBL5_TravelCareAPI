@@ -1,10 +1,8 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
-  Param,
   Post,
   Req,
   UseGuards,
@@ -12,7 +10,6 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ApiOkResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { User } from '../user/entities/user.entity';
 import { LoginDto } from './dto/login.dto';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { Request } from 'express';

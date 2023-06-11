@@ -367,6 +367,20 @@ export class BookingService {
         },
         user: true,
       },
+      select: {
+        user: {
+          accountId: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          profileImageUrl: true,
+          account: {
+            id: true,
+            username: true,
+          },
+        },
+      },
     });
 
     return bookings;
@@ -405,6 +419,20 @@ export class BookingService {
           },
         },
         user: true,
+      },
+      select: {
+        user: {
+          accountId: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phoneNumber: true,
+          profileImageUrl: true,
+          account: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
 

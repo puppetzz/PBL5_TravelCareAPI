@@ -25,6 +25,7 @@ import { Hotel } from './entities/hotel.entity';
 import { FilterDto } from './dto/filter.dto';
 import { HotelResponse } from './types/response-hotel.type';
 import { FilterRoomDto } from 'src/rooms/dto/filter-room.dto';
+import { LocationAccess } from 'src/auth/guards/access-location.guard';
 
 @Controller('hotels')
 @ApiTags('Hotel')
@@ -60,17 +61,25 @@ export class HotelController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all hotels' })
+  @ApiSecurity('JWT-auth')
+  @UseGuards(LocationAccess)
   async getAllhotels(
+    @GetCurrentAccount() user: User,
     @Query(ValidationPipe) filterDto: FilterDto,
   ): Promise<HotelResponse> {
-    return this.hotelService.getAllHotels(filterDto);
+    return this.hotelService.getAllHotels(user, filterDto);
   }
 
   @Get('/:hotelId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get hotel by Id' })
-  async getHotelById(@Param('hotelId') id: string): Promise<Hotel> {
-    return this.hotelService.getHotelById(id);
+  @ApiSecurity('JWT-auth')
+  @UseGuards(LocationAccess)
+  async getHotelById(
+    @GetCurrentAccount() user: User,
+    @Param('hotelId') id: string,
+  ): Promise<Hotel> {
+    return this.hotelService.getHotelById(id, user);
   }
   @Patch('/:hotelId/register')
   @UseGuards(AccessTokenGuard)
